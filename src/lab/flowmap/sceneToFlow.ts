@@ -242,14 +242,21 @@ export function sceneToFlow(
   }
 
   // edu: every card is EXPANDED (wide + tall), so the sim's tight diagonal layout
-  // is re-seated to fit them WITHOUT a first-render collision nudge:
-  //  - the agent goes to the far left, so its right edge clears the worker column
-  //    (workers no longer shove it down as they spawn);
-  //  - the user drops below the agent's typical expanded height, so the tall agent
-  //    and the user no longer overlap (they share the left column). y=520 is where
-  //    the resolver used to settle it — authoring it there means "already placed".
+  // is re-seated to a clean LEFT-TO-RIGHT reading, so the user->agent rail is a
+  // short horizontal hop and never crosses the map:
+  //  - the user sits in its OWN left column, its right edge clear of the wide
+  //    agent's x-range (so the rail reads left-to-right, not back across);
+  //  - the agent is the centre;
+  //  - the llm is on the right, pushed further out only when the lesson fans out
+  //    to workers, which then occupy the middle-right column between the two.
   // A local override, never a mutation of the shared (sim-facing) layout.
-  const EDU_POS: Record<string, XY> = { agent: { x: 40, y: 150 }, user: { x: 40, y: 520 } };
+  const hasWorkers = (opts.subSlots ?? 0) > 0;
+  const EDU_POS: Record<string, XY> = {
+    user: { x: 20, y: 180 },
+    agent: { x: 440, y: 40 },
+    llm: hasWorkers ? { x: 1420, y: 120 } : { x: 1040, y: 120 },
+  };
+  const subBaseX = 1020; // the worker column sits right of the wide agent (ends ~980)
   const posOf = (id: string): XY => (declutter && EDU_POS[id]) || L.pos[id];
   const N = (id: string, type: string, data: Record<string, unknown>, z = 10) =>
     nodes.push({ id, type, position: posOf(id), data, zIndex: z });
@@ -325,7 +332,7 @@ export function sceneToFlow(
   const subYs = subagentYs(slotCount, L.subBase.y, SUB_BAND_BOTTOM, L.subGap);
   subs.forEach((c, i) => {
     const id = `sub-${c.id}`;
-    L.pos[id] = { x: L.subBase.x, y: subYs[i] };
+    L.pos[id] = { x: declutter ? subBaseX : L.subBase.x, y: subYs[i] };
     const act = activity(c.focus, c.disk, c.activeFile, c.activeCommand, c.activeMcp, c.gate, lang);
     N(id, "subagent", {
       id: c.id,

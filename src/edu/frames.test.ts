@@ -173,25 +173,28 @@ describe("subagent positions are stable across a lesson's steps", () => {
   }
 });
 
-// The edu layout re-seats the expanded cards so they do NOT overlap by
-// construction: the wide agent goes to the far left (clear of the worker column)
-// and the user drops below it (clear of the tall agent). Pins the override so a
-// refactor cannot silently reintroduce the first-render collision nudge.
-describe("scenario frames seat the expanded agent + user without overlap", () => {
+// The edu layout reads left-to-right: the user sits in its own LEFT column, its
+// right edge clear of the wide agent's x-range, so the user->agent rail is a
+// short left-to-right hop and never crosses. Pins the arrangement so a refactor
+// cannot silently reintroduce the criss-cross (or a first-render overlap nudge).
+const AGENT_W = 540; // .pf-agent--wide
+const USER_W = 400; // .pf-user--wide
+describe("scenario frames read left-to-right (user left of the agent, no x-overlap)", () => {
   const scenarioLessons = LESSONS.filter((l): l is ScenarioLesson => l.mode === "scenario");
   for (const lesson of scenarioLessons) {
-    it(`${lesson.id}: agent far-left, user below it`, () => {
+    it(`${lesson.id}: user column is clear of the agent, llm is to the right`, () => {
       const frames = lessonFrames(lesson, "en");
       for (const f of frames) {
         const agent = f.nodes.find((n) => n.id === "agent");
         const user = f.nodes.find((n) => n.id === "user");
+        const llm = f.nodes.find((n) => n.id === "llm");
         expect(agent, "no agent node").toBeTruthy();
-        expect(agent!.position.x, "agent not seated at the far left").toBe(40);
         if (user) {
-          expect(user.position.x).toBe(40);
-          // the user sits below the agent's top, in its own vertical band
-          expect(user.position.y).toBeGreaterThan(agent!.position.y);
+          // the user's right edge is left of the agent's left edge -> clean rail
+          expect(user.position.x + USER_W).toBeLessThanOrEqual(agent!.position.x);
         }
+        // the llm sits to the right of the agent
+        if (llm) expect(llm.position.x).toBeGreaterThanOrEqual(agent!.position.x + AGENT_W);
       }
     });
   }
@@ -214,8 +217,11 @@ describe("Frame.bbox is a single stable rect per lesson", () => {
         expect(f.bbox.width).toBe(b0.width);
         expect(f.bbox.height).toBe(b0.height);
       }
+      // decluttered (no outside zone / external services) is asserted separately;
+      // here just guard against a runaway rect. The clean left-to-right layout
+      // legitimately spans the former "outside" x-range for the llm column.
       if (lesson.mode === "scenario") {
-        expect(b0.x + b0.width, `${lesson.id} rect still spans the old outside`).toBeLessThan(1372);
+        expect(b0.x + b0.width, `${lesson.id} rect ran away`).toBeLessThan(2200);
       }
     });
   }
