@@ -164,6 +164,46 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
           </button>
         </section>
 
+        <section className="edu-home-handbook" aria-label={t({ en: "handbook", de: "handbuch" }, lang)}>
+          <a className="hb-card" href="/handbook.html">
+            <span className="hb-preview" aria-hidden="true">
+              <svg viewBox="0 0 200 128" role="img">
+                <rect x="1" y="1" width="198" height="126" rx="9" fill="var(--bg)" stroke="var(--border)" />
+                {/* a little table of contents spine */}
+                <line x1="52" y1="10" x2="52" y2="118" stroke="var(--border)" />
+                <rect x="12" y="20" width="28" height="4" rx="2" fill="var(--accent)" />
+                <rect x="12" y="32" width="24" height="3" rx="1.5" fill="var(--text-faint)" />
+                <rect x="12" y="40" width="26" height="3" rx="1.5" fill="var(--text-faint)" />
+                <rect x="12" y="48" width="20" height="3" rx="1.5" fill="var(--text-faint)" />
+                <rect x="12" y="56" width="25" height="3" rx="1.5" fill="var(--text-faint)" />
+                {/* the page: a heading then columns of text */}
+                <rect x="66" y="18" width="70" height="6" rx="3" fill="var(--text-dim)" />
+                <rect x="66" y="34" width="120" height="3" rx="1.5" fill="var(--border-strong)" />
+                <rect x="66" y="41" width="112" height="3" rx="1.5" fill="var(--border-strong)" />
+                <rect x="66" y="48" width="118" height="3" rx="1.5" fill="var(--border-strong)" />
+                <rect x="66" y="64" width="44" height="5" rx="2.5" fill="var(--accent)" />
+                <rect x="66" y="76" width="120" height="3" rx="1.5" fill="var(--border-strong)" />
+                <rect x="66" y="83" width="104" height="3" rx="1.5" fill="var(--border-strong)" />
+                <rect x="66" y="98" width="44" height="5" rx="2.5" fill="var(--sand)" />
+                <rect x="66" y="110" width="116" height="3" rx="1.5" fill="var(--border-strong)" />
+              </svg>
+            </span>
+            <span className="hb-text">
+              <strong>{t({ en: "the handbook", de: "das handbuch" }, lang)}</strong>
+              <span>
+                {t(
+                  {
+                    en: "everything the simulator and the lessons can do: the map, the transport, the fifteen lessons, the shortcuts and every concept. click to open it.",
+                    de: "alles, was der simulator und die lektionen können: die karte, der transport, die fünfzehn lektionen, die kürzel und jedes konzept. klick zum öffnen.",
+                  },
+                  lang,
+                )}
+              </span>
+            </span>
+            <span className="hb-open" aria-hidden="true">→</span>
+          </a>
+        </section>
+
         <section className="edu-home-features" aria-label={t({ en: "features", de: "features" }, lang)}>
           {FEATURES.map((f) => (
             <article key={f.title.en} className="edu-home-card">

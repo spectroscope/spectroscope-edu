@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en" data-design="spectroscope">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>spectroscope edu · handbook</title>
+<link rel="icon" href="/brand/favicon.svg" />
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#17120D;--surface:#201913;--surface-2:#292019;--surface-3:#2E251C;
+    --border:#33291F;--border-strong:#5C5142;
+    --text:#EDE7DC;--text-dim:#A2988A;--text-faint:#5C5142;--text-on-accent:#2A1B08;
+    --accent:#CE9440;--accent-soft:rgba(206,148,64,0.13);
+    --sand:#8B7CF0;
+    --sp-red:#C05A4C;--sp-amber:#CE9440;--sp-teal:#2DD4A7;--sp-ocean:#2CB1C4;--sp-violet:#8B7CF0;
+    --ev-token:var(--sp-teal);--ev-tool:var(--sp-amber);--ev-gate:var(--sp-red);
+    --ev-subagent:var(--sp-ocean);--ev-lifecycle:var(--text-faint);--ev-reasoning:var(--sp-violet);
+    --ok:#2DD4A7;--warn:#CE9440;--error:#C05A4C;
+    --font-ui:"Inter Variable",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --font-mono:"JetBrains Mono Variable","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  [data-design="paper"]{
+    color-scheme:light;
+    --bg:#F6F4EE;--surface:#EFECE3;--surface-2:#E9E5D8;--surface-3:#E2DCCC;
+    --border:#DDD8CB;--border-strong:#C4BCAD;
+    --text:#17161A;--text-dim:#6A665D;--text-faint:#A39E92;--text-on-accent:#F6F4EE;
+    --accent:#2E7EA6;--accent-soft:rgba(46,126,166,0.14);--sand:#8B7CF0;
+  }
+  [data-design="still"]{
+    color-scheme:light;
+    --bg:#fbfbfd;--surface:#ffffff;--surface-2:#f2f2f5;--surface-3:#e5e5ea;
+    --border:rgba(0,0,0,0.11);--border-strong:rgba(0,0,0,0.22);
+    --text:#1d1d1f;--text-dim:#808085;--text-faint:rgba(29,29,31,0.38);--text-on-accent:#fff;
+    --accent:#0071e3;--accent-soft:rgba(0,113,227,0.16);--sand:#6e6e73;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:var(--font-ui);font-size:15px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,kbd{font-family:var(--font-mono);font-size:0.86em}
+  code{background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px}
+  kbd{background:var(--surface-2);border:1px solid var(--border-strong);border-bottom-width:2px;border-radius:5px;padding:1px 6px 2px}
+
+  header.top{
+    position:sticky;top:0;z-index:10;
+    display:flex;align-items:center;gap:14px;
+    padding:14px clamp(20px,5vw,40px);
+    background:color-mix(in srgb,var(--bg) 88%,transparent);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--border);
+  }
+  .brand{display:inline-flex;align-items:center;gap:10px;font-weight:650}
+  .brand img{width:24px;height:24px}
+  .brand .sub{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);border:1px solid var(--border);border-radius:999px;padding:2px 8px}
+  .top .spacer{flex:1}
+  .toggle{display:inline-flex;border:1px solid var(--border-strong);border-radius:9px;overflow:hidden}
+  .toggle button{background:none;border:0;color:var(--text-dim);font:inherit;font-size:12px;padding:5px 11px;cursor:pointer}
+  .toggle button.on{background:var(--accent-soft);color:var(--text)}
+  .home-link{font-size:13px;color:var(--text-dim)}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,40px);display:grid;grid-template-columns:210px 1fr;gap:clamp(24px,4vw,56px)}
+  nav.toc{position:sticky;top:74px;align-self:start;height:max-content;padding:24px 0;font-size:13px}
+  nav.toc p{margin:0 0 8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-faint)}
+  nav.toc a{display:block;color:var(--text-dim);padding:4px 0;border-left:2px solid transparent;padding-left:10px;margin-left:-2px}
+  nav.toc a:hover{color:var(--text);text-decoration:none}
+  main{padding:8px 0 96px;min-width:0}
+  .hero{padding:40px 0 24px;border-bottom:1px solid var(--border);margin-bottom:8px}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--sand);margin:0 0 12px}
+  .hero h1{font-size:clamp(28px,5vw,40px);line-height:1.1;font-weight:650;letter-spacing:-.015em;margin:0 0 12px}
+  .hero p{color:var(--text-dim);max-width:60ch;margin:0}
+  section.doc{padding:38px 0;border-bottom:1px solid var(--border)}
+  section.doc:last-child{border-bottom:0}
+  section.doc h2{font-size:22px;font-weight:650;letter-spacing:-.01em;margin:0 0 6px;scroll-margin-top:80px}
+  section.doc h2 .n{color:var(--text-faint);font-family:var(--font-mono);font-size:14px;margin-right:10px}
+  section.doc h3{font-size:15px;font-weight:650;margin:24px 0 6px}
+  section.doc p{color:var(--text-dim);max-width:70ch}
+  section.doc .lead{color:var(--text);font-size:16px}
+  ul.clean{list-style:none;padding:0;margin:10px 0;max-width:72ch}
+  ul.clean li{position:relative;padding:6px 0 6px 22px;color:var(--text-dim);border-top:1px solid var(--border)}
+  ul.clean li:first-child{border-top:0}
+  ul.clean li::before{content:"";position:absolute;left:2px;top:14px;width:7px;height:2px;border-radius:1px;background:var(--accent)}
+  ul.clean li b{color:var(--text)}
+  .tick{display:inline-block;width:9px;height:9px;border-radius:2px;vertical-align:-1px;margin-right:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin:14px 0}
+  .card{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:14px 16px}
+  .card h4{margin:0 0 4px;font-size:14px;display:flex;align-items:center;gap:8px}
+  .card p{margin:0;font-size:13px;line-height:1.5}
+  .keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:14px 0}
+  .keys .row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+  .keys .row span{font-size:13px;color:var(--text-dim)}
+  .note{background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 0;color:var(--text-dim);font-size:13.5px}
+  footer{max-width:1080px;margin:0 auto;padding:24px clamp(20px,5vw,40px) 64px;color:var(--text-faint);font-size:13px;border-top:1px solid var(--border)}
+  [lang="en"] .de,[lang="de"] .en{display:none}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr}nav.toc{display:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand"><img id="mark" src="/brand/logo-icon.svg" alt="" /> spectroscope <span class="sub">edu</span></span>
+  <span class="spacer"></span>
+  <a class="home-link" href="/"><span class="en">back to the app</span><span class="de">zurück zur app</span> &#8599;</a>
+  <span class="toggle" id="lang"><button data-l="en">en</button><button data-l="de">de</button></span>
+  <span class="toggle" id="theme"><button data-d="spectroscope">dark</button><button data-d="paper">paper</button><button data-d="still">white</button></span>
+</header>
+
+<div class="wrap">
+  <nav class="toc">
+    <p><span class="en">contents</span><span class="de">inhalt</span></p>
+    <a href="#start"><span class="en">what this is</span><span class="de">was das ist</span></a>
+    <a href="#map"><span class="en">reading the map</span><span class="de">die karte lesen</span></a>
+    <a href="#sim"><span class="en">the simulator</span><span class="de">der simulator</span></a>
+    <a href="#lessons"><span class="en">the lessons</span><span class="de">die lektionen</span></a>
+    <a href="#keys"><span class="en">shortcuts</span><span class="de">tastenkürzel</span></a>
+    <a href="#concepts"><span class="en">concepts</span><span class="de">konzepte</span></a>
+    <a href="#notes"><span class="en">good to know</span><span class="de">gut zu wissen</span></a>
+  </nav>
+
+  <main>
+    <div class="hero" id="start">
+      <p class="eyebrow"><span class="en">the edu portal · handbook</span><span class="de">das edu-portal · handbuch</span></p>
+      <h1><span class="en">everything the simulator and the lessons can do</span><span class="de">alles, was der simulator und die lektionen können</span></h1>
+      <p class="en">spectroscope is the agent orchestrator you can watch. this app teaches what you are watching, two ways: a <b>simulator</b> that replays a scripted agent run on a live system map, and a set of <b>lessons</b> that build an agent up one concept at a time. no backend, no key, nothing to install. this handbook covers both.</p>
+      <p class="de">spectroscope ist der agent-orchestrator, den man beobachten kann. diese app lehrt, was du beobachtest, auf zwei arten: ein <b>simulator</b>, der einen gescripteten agenten-lauf auf einer lebenden system-map abspielt, und eine reihe <b>lektionen</b>, die einen agenten konzept für konzept aufbauen. kein backend, kein key, nichts zu installieren. dieses handbuch deckt beides ab.</p>
+    </div>
+
+    <section class="doc" id="map">
+      <h2><span class="n">01</span><span class="en">reading the map</span><span class="de">die karte lesen</span></h2>
+      <p class="lead en">both the simulator and the lessons draw the same system map. learn it once and you read it everywhere.</p>
+      <p class="lead de">der simulator und die lektionen zeichnen dieselbe system-map. lern sie einmal, und du liest sie überall.</p>
+      <ul class="clean">
+        <li><b><span class="en">your mac vs. outside</span><span class="de">dein mac vs. außerhalb</span></b><span class="en">: a boundary splits what runs on your machine from what lives beyond the network. the llm sits inside when it is local, outside when it is remote.</span><span class="de">: eine grenze trennt, was auf deiner maschine läuft, von dem, was jenseits des netzes lebt. das llm sitzt innen wenn lokal, außen wenn remote.</span></li>
+        <li><b>agent</b><span class="en">: the hub. it shows the <b>loop</b> (plan, call tools, read results), the <b>permission gate</b>, the <b>tool belt</b>, and the live context sent to the llm.</span><span class="de">: die zentrale. sie zeigt die <b>loop</b> (planen, tools aufrufen, ergebnisse lesen), das <b>permission-gate</b>, den <b>tool-gürtel</b> und den live-kontext, der ans llm geht.</span></li>
+        <li><b><span class="en">operating system band</span><span class="de">betriebssystem-band</span></b><span class="en">: the stations the agent reaches through, disk, shell, mcp-client and the network stack.</span><span class="de">: die stationen, durch die der agent greift: disk, shell, mcp-client und der netzwerk-stack.</span></li>
+        <li><b>llm</b><span class="en">: the model. it only reads and writes text; everything around it is the harness.</span><span class="de">: das modell. es liest und schreibt nur text; alles darum herum ist der harness.</span></li>
+        <li><b><span class="en">subagents / workers</span><span class="de">subagenten / worker</span></b><span class="en">: forked agents, each with its own context window, for parallel or isolated work.</span><span class="de">: abgespaltene agenten, jeder mit eigenem kontextfenster, für parallele oder isolierte arbeit.</span></li>
+      </ul>
+      <h3><span class="en">the rails</span><span class="de">die rails</span></h3>
+      <ul class="clean">
+        <li><span class="tick" style="background:var(--accent)"></span><b><span class="en">active rail</span><span class="de">aktives rail</span></b><span class="en">: where it is happening right now; a packet rides it.</span><span class="de">: wo es gerade passiert; ein paket fährt darauf.</span></li>
+        <li><span class="tick" style="background:var(--border-strong)"></span><b><span class="en">inside the agent system</span><span class="de">im agenten-system</span></b><span class="en">: a link that stays on your mac.</span><span class="de">: eine verbindung, die auf deinem mac bleibt.</span></li>
+        <li><span class="tick" style="background:var(--border-strong)"></span><b>outbound</b><span class="en">: dashed; a leg that crosses the network boundary.</span><span class="de">: gestrichelt; ein bein, das die netzgrenze überquert.</span></li>
+      </ul>
+      <p class="en">every event also carries a color, the same one you meet in the trace: <span class="tick" style="background:var(--ev-token)"></span>token, <span class="tick" style="background:var(--ev-tool)"></span>tool, <span class="tick" style="background:var(--ev-gate)"></span>gate, <span class="tick" style="background:var(--ev-subagent)"></span>subagent, <span class="tick" style="background:var(--ev-reasoning)"></span>reasoning.</p>
+      <p class="de">jedes ereignis trägt auch eine farbe, dieselbe, die dir im trace begegnet: <span class="tick" style="background:var(--ev-token)"></span>token, <span class="tick" style="background:var(--ev-tool)"></span>tool, <span class="tick" style="background:var(--ev-gate)"></span>gate, <span class="tick" style="background:var(--ev-subagent)"></span>subagent, <span class="tick" style="background:var(--ev-reasoning)"></span>reasoning.</p>
+    </section>
+
+    <section class="doc" id="sim">
+      <h2><span class="n">02</span><span class="en">the simulator</span><span class="de">der simulator</span></h2>
+      <p class="lead en">a scripted agent run you steer. it replays real events with no backend, so you can stop, scrub and read every step.</p>
+      <p class="lead de">ein gescripteter agenten-lauf, den du steuerst. er spielt echte ereignisse ab, ohne backend, du kannst also stoppen, scrubben und jeden schritt lesen.</p>
+      <h3><span class="en">the transport</span><span class="de">der transport</span></h3>
+      <ul class="clean">
+        <li><b><span class="en">the now band</span><span class="de">das now-band</span></b><span class="en">: over the map, it always names the current station (the model is thinking, at the permission gate, done).</span><span class="de">: über der karte nennt es immer die aktuelle station (das modell denkt, am permission-gate, fertig).</span></li>
+        <li><b><span class="en">the replay bar</span><span class="de">die replay-leiste</span></b><span class="en">: drag it to scroll the run to any step. reset, previous, play and next sit beside it.</span><span class="de">: zieh sie, um den lauf zu jedem schritt zu scrollen. reset, zurück, play und vor liegen daneben.</span></li>
+        <li><b><span class="en">jsonl + trace drawers</span><span class="de">jsonl- + trace-drawer</span></b><span class="en">: open the left and right panels to read the same run as the raw event stream and as the causal trace. both move in lockstep with the map.</span><span class="de">: öffne das linke und rechte panel, um denselben lauf als rohen event-strom und als kausalen trace zu lesen. beide laufen im gleichschritt mit der karte.</span></li>
+        <li><b><span class="en">local / remote flip</span><span class="de">lokal / remote-schalter</span></b><span class="en">: switch the model between a local one on your mac and a hosted one beyond the boundary, and watch the llm card cross. remote is the default.</span><span class="de">: schalte das modell zwischen einem lokalen auf deinem mac und einem gehosteten jenseits der grenze um und sieh die llm-karte hinüberwandern. remote ist der standard.</span></li>
+        <li><b><span class="en">drag a card</span><span class="de">karte ziehen</span></b><span class="en">: move any card and it stays put across every step; only cards you did not touch re-arrange.</span><span class="de">: verschieb eine karte und sie bleibt über alle schritte liegen; nur karten, die du nicht angefasst hast, ordnen sich neu.</span></li>
+      </ul>
+      <h3><span class="en">the scenarios</span><span class="de">die szenarien</span></h3>
+      <p class="en">the sidebar lists scripted runs to steer: a build_plan delegation, a three-lens code review, a permission-gate walk (blocked and allowed), disk and shell, a coding fan-out, a research consolidation, a context-window fill, a dark-mode plan. pick one and step it.</p>
+      <p class="de">die seitenleiste listet gescriptete läufe zum steuern: eine build_plan-delegation, ein drei-linsen-code-review, ein permission-gate-durchlauf (blockiert und erlaubt), disk und shell, ein coding-fan-out, eine research-konsolidierung, ein kontextfenster-füllen, ein dark-mode-plan. wähl einen und steppe ihn.</p>
+    </section>
+
+    <section class="doc" id="lessons">
+      <h2><span class="n">03</span><span class="en">the lessons</span><span class="de">die lektionen</span></h2>
+      <p class="lead en">short, interactive lessons that build an agent up one concept at a time, on the same cards you meet in the simulator.</p>
+      <p class="lead de">kurze, interaktive lektionen, die einen agenten konzept für konzept aufbauen, auf denselben karten, die dir im simulator begegnen.</p>
+      <ul class="clean">
+        <li><b><span class="en">step or scrub</span><span class="de">steppen oder scrubben</span></b><span class="en">: use the arrows, play, or the scrub bar. each step advances one teaching beat, with a caption that explains what just happened.</span><span class="de">: nutz die pfeile, play oder die scrub-leiste. jeder schritt bringt einen lehr-takt weiter, mit einer bildunterschrift, die erklärt, was gerade passiert ist.</span></li>
+        <li><b><span class="en">predict then reveal</span><span class="de">vorhersagen, dann aufdecken</span></b><span class="en">: some steps ask you to guess first (which verdict? which skill loads?) and reveal the answer after you choose.</span><span class="de">: manche schritte lassen dich erst raten (welches urteil? welcher skill lädt?) und decken die antwort nach deiner wahl auf.</span></li>
+        <li><b><span class="en">the readout rail</span><span class="de">die readout-leiste</span></b><span class="en">: on the right, it tracks the lesson's meter: a context ring, a token budget, the growing session.jsonl, or what the harness gives you.</span><span class="de">: rechts verfolgt sie den messwert der lektion: einen kontext-ring, ein token-budget, das wachsende session.jsonl oder was der harness dir gibt.</span></li>
+      </ul>
+      <h3><span class="en">the fifteen lessons</span><span class="de">die fünfzehn lektionen</span></h3>
+      <div class="grid">
+        <div class="card"><h4><span class="tick" style="background:var(--ev-tool)"></span>anatomy of an agent</h4><p><span class="en">a raw model becomes a working agent, one harness layer at a time.</span><span class="de">aus einem rohen modell wird ein arbeitender agent, schicht für schicht.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-token)"></span>inside the context window</h4><p><span class="en">the window fills to rot, then the harness compacts it.</span><span class="de">das fenster füllt sich bis zur fäulnis, dann kompaktiert der harness.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--accent)"></span>one turn through the machine</h4><p><span class="en">assemble, decide, gate, execute, observe, repeat.</span><span class="de">zusammenbauen, entscheiden, gate, ausführen, beobachten, wiederholen.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-gate)"></span>the gate decides</h4><p><span class="en">allow, ask or deny, read off the blast radius. predict each.</span><span class="de">erlauben, fragen oder ablehnen, am blast-radius. rate jedes.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-token)"></span>the four moves on the window</h4><p><span class="en">select, compress, isolate, write, and the budget never grows.</span><span class="de">select, compress, isolate, write, und das budget wächst nie.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-tool)"></span>the agent draws</h4><p><span class="en">generate_image, a multimodal action on the same loop and gate.</span><span class="de">generate_image, eine multimodale aktion auf derselben loop und gate.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--sand)"></span>thin until it matches</h4><p><span class="en">progressive disclosure, load context only when it is needed.</span><span class="de">progressive disclosure, kontext nur bei bedarf laden.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--sand)"></span>a skill is knowledge on demand</h4><p><span class="en">a folder loaded on match, into context, no weights change.</span><span class="de">ein ordner, bei match geladen, in den kontext, ohne gewichts-änderung.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-subagent)"></span>mcp: tools from another process</h4><p><span class="en">the call rides client, network, server, and the gate still applies.</span><span class="de">der aufruf fährt client, netz, server, und das gate gilt weiter.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-subagent)"></span>serial vs. orchestrated</h4><p><span class="en">fan out to isolated workers, each with its own window.</span><span class="de">fächere zu isolierten workern auf, jeder mit eigenem fenster.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-subagent)"></span>a fleet that reaches out</h4><p><span class="en">workers that each call an mcp server from their own window.</span><span class="de">worker, die je einen mcp-server aus dem eigenen fenster rufen.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--accent)"></span>a real feature, many turns</h4><p><span class="en">agency is many small verified steps sustained over a task.</span><span class="de">agency ist viele kleine, verifizierte schritte über eine aufgabe.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-gate)"></span>a hook is a guarantee</h4><p><span class="en">a checkpoint that fires every time, blocking or injecting.</span><span class="de">ein checkpoint, der jedes mal feuert, blockt oder einspeist.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--sand)"></span>the extensions compose</h4><p><span class="en">hook, mcp and skill layered together in one run.</span><span class="de">hook, mcp und skill in einem lauf zusammengelegt.</span></p></div>
+        <div class="card"><h4><span class="tick" style="background:var(--ev-lifecycle)"></span>the spec survives the session</h4><p><span class="en">durable decisions written to disk outlive the window.</span><span class="de">dauerhafte entscheidungen auf disk überleben das fenster.</span></p></div>
+      </div>
+    </section>
+
+    <section class="doc" id="keys">
+      <h2><span class="n">04</span><span class="en">keyboard shortcuts</span><span class="de">tastenkürzel</span></h2>
+      <p class="en">press <kbd>?</kbd> (or <kbd>ß</kbd>, the same key without shift) anywhere for the full keymap. the essentials:</p>
+      <p class="de">drück <kbd>?</kbd> (oder <kbd>ß</kbd>, dieselbe taste ohne shift) überall für die volle keymap. das wichtigste:</p>
+      <div class="keys">
+        <div class="row"><kbd>&#8594;</kbd> / <kbd>space</kbd><span class="en">step forward</span><span class="de">schritt vor</span></div>
+        <div class="row"><kbd>&#8592;</kbd><span class="en">step back</span><span class="de">schritt zurück</span></div>
+        <div class="row"><kbd>f</kbd><span class="en">flow: auto-play</span><span class="de">flow: auto-play</span></div>
+        <div class="row"><kbd>r</kbd><span class="en">reset to the start</span><span class="de">zurück zum start</span></div>
+        <div class="row"><kbd>j</kbd><span class="en">jsonl panel</span><span class="de">jsonl-panel</span></div>
+        <div class="row"><kbd>t</kbd><span class="en">trace panel</span><span class="de">trace-panel</span></div>
+        <div class="row"><kbd>m</kbd><span class="en">model local / remote</span><span class="de">modell lokal / remote</span></div>
+        <div class="row"><kbd>h</kbd><span class="en">home</span><span class="de">startseite</span></div>
+        <div class="row"><kbd>?</kbd> / <kbd>ß</kbd><span class="en">this keymap</span><span class="de">diese keymap</span></div>
+      </div>
+    </section>
+
+    <section class="doc" id="concepts">
+      <h2><span class="n">05</span><span class="en">concepts, in one line each</span><span class="de">konzepte, je in einer zeile</span></h2>
+      <p class="en">the vocabulary the lessons teach, gathered here for reference.</p>
+      <p class="de">das vokabular, das die lektionen lehren, hier zum nachschlagen gesammelt.</p>
+      <ul class="clean">
+        <li><b><span class="en">the loop</span><span class="de">die loop</span></b><span class="en">: the model emits one thing; the harness runs it, feeds reality back, and repeats until the turn ends.</span><span class="de">: das modell gibt eine sache aus; der harness führt sie aus, speist die realität zurück und wiederholt, bis die runde endet.</span></li>
+        <li><b><span class="en">the context window</span><span class="de">das kontextfenster</span></b><span class="en">: a fixed budget of tokens, rebuilt every turn; when it fills, quality rots, so the harness compacts it.</span><span class="de">: ein festes token-budget, jede runde neu gebaut; wenn es voll wird, verrottet die qualität, also kompaktiert der harness.</span></li>
+        <li><b><span class="en">the four moves</span><span class="de">die vier operationen</span></b><span class="en">: select in, compress down, isolate away, write out, none of which enlarges the window.</span><span class="de">: select rein, compress runter, isolate weg, write raus, keine vergrößert das fenster.</span></li>
+        <li><b><span class="en">the permission gate</span><span class="de">das permission-gate</span></b><span class="en">: the one write path; every side-effecting call is allowed, asked, or denied, and every verdict is logged.</span><span class="de">: der eine schreibpfad; jeder aufruf mit nebenwirkung wird erlaubt, erfragt oder abgelehnt, und jedes urteil wird geloggt.</span></li>
+        <li><b>tools</b><span class="en">: read_file, write_file, run_command and more, a registry the harness validates, executes, and feeds back.</span><span class="de">: read_file, write_file, run_command und mehr, ein register, das der harness prüft, ausführt und zurückspeist.</span></li>
+        <li><b>mcp</b><span class="en">: the model context protocol, tools that live in a separate server process and plug in over a standard protocol.</span><span class="de">: das model context protocol, tools, die in einem separaten server-prozess leben und über ein standard-protokoll andocken.</span></li>
+        <li><b>skill</b><span class="en">: a folder (SKILL.md plus resources) the harness loads only when the task matches, adding expertise without changing the model.</span><span class="de">: ein ordner (SKILL.md plus ressourcen), den der harness nur bei passender aufgabe lädt, expertise ohne änderung am modell.</span></li>
+        <li><b>hook</b><span class="en">: a guaranteed checkpoint that fires on an event and can block a call or inject context.</span><span class="de">: ein garantierter checkpoint, der auf ein ereignis feuert und einen aufruf blocken oder kontext einspeisen kann.</span></li>
+        <li><b><span class="en">subagents / fleet</span><span class="de">subagenten / flotte</span></b><span class="en">: forked agents with their own windows; a fleet fans work out and merges only the results back.</span><span class="de">: abgespaltene agenten mit eigenen fenstern; eine flotte fächert arbeit auf und führt nur die ergebnisse zurück.</span></li>
+        <li><b>session.jsonl</b><span class="en">: the append-only log of the whole run, replayable line by line, the reason any run can be watched.</span><span class="de">: das append-only-log des ganzen laufs, zeile für zeile abspielbar, der grund, warum jeder lauf beobachtbar ist.</span></li>
+      </ul>
+    </section>
+
+    <section class="doc" id="notes">
+      <h2><span class="n">06</span><span class="en">good to know</span><span class="de">gut zu wissen</span></h2>
+      <ul class="clean">
+        <li><b><span class="en">backend-free</span><span class="de">backend-frei</span></b><span class="en">: every run is a scripted replay; there is no server, no key, and no model call. it is deterministic and scrubbable.</span><span class="de">: jeder lauf ist ein gescriptetes replay; kein server, kein key, kein modell-aufruf. deterministisch und scrubbar.</span></li>
+        <li><b><span class="en">three themes, two languages</span><span class="de">drei themes, zwei sprachen</span></b><span class="en">: switch dark, paper or white and english or german from the sidebar; this handbook follows the same toggles above.</span><span class="de">: schalte dark, paper oder white und englisch oder deutsch aus der seitenleiste; dieses handbuch folgt denselben schaltern oben.</span></li>
+        <li><b><span class="en">runs from files</span><span class="de">läuft aus dateien</span></b><span class="en">: the whole app is static assets, local-first, the way the product itself runs.</span><span class="de">: die ganze app sind statische dateien, local-first, so wie das produkt selbst läuft.</span></li>
+      </ul>
+      <div class="note">
+        <span class="en">ready? <a href="/#simulator">open the simulator</a> or <a href="/#edu">browse the lessons</a>.</span>
+        <span class="de">bereit? <a href="/#simulator">simulator öffnen</a> oder <a href="/#edu">lektionen ansehen</a>.</span>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <span class="en">a teaching companion to spectroscope, the agent orchestrator you can watch. open source, mit, local-first.</span>
+  <span class="de">ein lern-begleiter zu spectroscope, dem agent-orchestrator, den man beobachten kann. open source, mit, local-first.</span>
+</footer>
+
+<script>
+  (function(){
+    var root=document.documentElement;
+    function readDesign(){try{var p=JSON.parse(localStorage.getItem("spectroscope:design")||"{}");return p.design||"spectroscope";}catch(e){return "spectroscope";}}
+    function readLang(){try{return localStorage.getItem("spectroscope:lang")||"en";}catch(e){return "en";}}
+    function applyDesign(d){root.setAttribute("data-design",d);document.getElementById("mark").src=(d==="spectroscope")?"/brand/logo-icon.svg":"/brand/logo-icon-light.svg";
+      document.querySelectorAll("#theme button").forEach(function(b){b.classList.toggle("on",b.dataset.d===d);});}
+    function applyLang(l){root.setAttribute("lang",l);
+      document.querySelectorAll("#lang button").forEach(function(b){b.classList.toggle("on",b.dataset.l===l);});}
+    applyDesign(readDesign());applyLang(readLang());
+    document.getElementById("theme").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var d=b.dataset.d;applyDesign(d);
+      try{var p=JSON.parse(localStorage.getItem("spectroscope:design")||"{}");p.design=d;localStorage.setItem("spectroscope:design",JSON.stringify(p));}catch(err){}});
+    document.getElementById("lang").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var l=b.dataset.l;applyLang(l);
+      try{localStorage.setItem("spectroscope:lang",l);}catch(err){}});
+  })();
+</script>
+</body>
+</html>

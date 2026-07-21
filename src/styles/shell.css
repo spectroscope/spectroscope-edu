@@ -666,6 +666,80 @@
   white-space: nowrap;
 }
 
+/* the handbook preview card under the keymap: a mini page thumbnail + a caption,
+   the whole card links to /handbook.html (a preview, not a bare text link) */
+.edu-home-handbook {
+  padding-bottom: var(--sp-5);
+}
+.hb-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: var(--sp-3) var(--sp-4);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.hb-card:hover,
+.hb-card:focus-visible {
+  border-color: var(--accent);
+  background: var(--surface-2);
+  outline: none;
+}
+.hb-preview {
+  flex: none;
+  width: 168px;
+}
+.hb-preview svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.hb-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.hb-text strong {
+  font-size: var(--fs-16);
+  font-weight: 650;
+}
+.hb-text span {
+  font-size: var(--fs-13);
+  color: var(--text-dim);
+  line-height: var(--lh-body);
+}
+.hb-open {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 17px;
+  font-weight: 700;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.hb-card:hover .hb-open,
+.hb-card:focus-visible .hb-open {
+  background: var(--accent);
+  color: var(--bg);
+  transform: translateX(2px);
+}
+@media (max-width: 560px) {
+  .hb-preview {
+    display: none;
+  }
+}
+
 .edu-home-foot {
   padding: var(--sp-5) 0 var(--sp-7);
   border-top: 1px solid var(--border);
