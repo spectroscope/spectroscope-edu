@@ -11,8 +11,9 @@ import type { Node, Edge } from "@xyflow/react";
 import type { RunEvent } from "../events";
 import type { Lang } from "../i18n/i18n";
 import { compile } from "../scenario/compile";
-import { advanceScene, initialScene, isLocalProvider, type Scene } from "../lab/labScene";
+import { advanceScene, initialScene, isLocalProvider } from "../lab/labScene";
 import { deriveDetail, sceneToFlow } from "../lab/flowmap/sceneToFlow";
+import { sceneNow } from "../lab/sceneNow";
 import type { EduLesson, EduStep, Loc, RevealEdge, RevealLesson, RevealNode, ScenarioLesson } from "./model";
 
 export interface Rect {
@@ -75,33 +76,6 @@ export function frameExtent(nodes: Node[]): Rect {
   }
   if (!Number.isFinite(minX)) return { x: 0, y: 0, width: 200, height: 120 };
   return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
-}
-
-// Derive the live status line from the folded scene (what the packet is doing).
-function nowLabel(scene: Scene): { en: string; de: string } {
-  if (scene.gate === "pending") return { en: "the permission gate is deciding", de: "das permission-gate entscheidet" };
-  const file = scene.activeFile ? ` ${scene.activeFile}` : "";
-  switch (scene.focus) {
-    case "llm":
-      return { en: "the model is thinking", de: "das modell denkt" };
-    case "disk":
-      return scene.disk === "write"
-        ? { en: `writing${file} to disk`, de: `schreibt${file} auf die disk` }
-        : { en: `reading${file} from disk`, de: `liest${file} von der disk` };
-    case "cmd":
-      return { en: `running: ${scene.activeCommand ?? "a command"}`, de: `führt aus: ${scene.activeCommand ?? "einen befehl"}` };
-    case "mcp":
-      return { en: `calling mcp${scene.activeMcp ? `: ${scene.activeMcp}` : ""}`, de: `mcp-aufruf${scene.activeMcp ? `: ${scene.activeMcp}` : ""}` };
-    case "gate":
-      return { en: "at the permission gate", de: "am permission-gate" };
-    case "user":
-      return { en: "done · control is with you", de: "fertig · die kontrolle ist bei dir" };
-    case "agent":
-    default:
-      return scene.subagents.length
-        ? { en: `orchestrating ${scene.subagents.length} workers`, de: `orchestriert ${scene.subagents.length} worker` }
-        : { en: "the harness is working", de: "der harness arbeitet" };
-  }
 }
 
 const railEdge = (e: RevealEdge, active: boolean): Edge => ({
@@ -233,7 +207,7 @@ export function scenarioFrames(lesson: ScenarioLesson, lang: Lang): Frame[] {
         }
       }
     }
-    return { nodes: flow.nodes, edges: flow.edges, applied, provider, now: nowLabel(scene), bbox: { x: 0, y: 0, width: 0, height: 0 } };
+    return { nodes: flow.nodes, edges: flow.edges, applied, provider, now: sceneNow(scene), bbox: { x: 0, y: 0, width: 0, height: 0 } };
   });
 
   // One STABLE rect for the whole lesson: the union of every card across every

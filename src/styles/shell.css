@@ -216,9 +216,32 @@
   min-width: 340px;
   min-height: 0;
   gap: var(--sp-3);
-  /* short viewport: scroll the controls/map/hint (the map keeps its 540px
-     min-height) instead of clipping the hint — restores the lifted .lab-center. */
+  /* short viewport: scroll the band/map/transport (the map keeps its 540px
+     min-height) instead of clipping the transport. */
   overflow-y: auto;
+}
+
+/* ---- the simulator's step-band (over the map) + replay transport (below it),
+   mirroring the edu lessons: no Step button, a scrub bar to scroll the run,
+   and a live band that names the current station. ---- */
+.sim-now {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  padding: 9px 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+.sim-transport {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex: none;
+}
+.sim-transport .edu-scrub {
+  flex: 1 1 auto;
 }
 
 /* ---- collapsible side drawers (v3 style): jsonl left, trace right ---- */

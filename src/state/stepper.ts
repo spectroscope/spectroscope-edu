@@ -122,6 +122,26 @@ function blockCount(queue: RunEvent[]): number {
   return n;
 }
 
+/** The applied-length after each coarse step over `events`, from 0 to the end —
+ *  e.g. [0, 3, 4, 7]. The replay scrubber walks these so a drag lands on a whole
+ *  step (one thinking run, one answer, one event), never mid-block. */
+export function stepBoundaries(events: RunEvent[]): number[] {
+  const bs = [0];
+  let cursor = 0;
+  while (cursor < events.length) {
+    cursor += blockCount(events.slice(cursor));
+    bs.push(cursor);
+  }
+  return bs;
+}
+
+/** The marks stack (applied-length after each step) for an arbitrary applied
+ *  slice, so stepBack stays symmetric after a scrub. */
+function marksFor(applied: RunEvent[], grain: StepGrain): number[] {
+  if (grain === "fine") return applied.map((_, i) => i + 1);
+  return stepBoundaries(applied).slice(1);
+}
+
 // ---- actions ---------------------------------------------------------------
 
 /** App feeds every live batch here; ignored while a replay is loaded. */
@@ -157,6 +177,25 @@ export function stepBack(): void {
     ...foldFrom(applied),
     fireSeq: state.fireSeq + 1,
     marks: marks.slice(0, -1),
+  };
+  emit();
+}
+
+/** Scrub to an absolute event cursor — fold to exactly `n` events (re-folded from
+ *  scratch, so it is exact at any position). Drives the replay bar; the applied
+ *  events past `n` go back to the front of the queue, like a big stepBack/step. */
+export function seek(n: number): void {
+  const all = [...state.applied, ...state.queue];
+  const target = Math.max(0, Math.min(all.length, Math.round(n)));
+  if (target === state.applied.length) return;
+  const applied = all.slice(0, target);
+  state = {
+    ...state,
+    applied,
+    queue: all.slice(target),
+    ...foldFrom(applied),
+    fireSeq: state.fireSeq + 1,
+    marks: marksFor(applied, state.grain),
   };
   emit();
 }
