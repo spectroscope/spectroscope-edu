@@ -91,6 +91,9 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
           <span className="edu-brand-name">spectroscope</span>
           <span className="edu-brand-sub">edu</span>
         </span>
+        <a className="edu-home-mainlink" href="https://spectroscope.ai/">
+          {t({ en: "main site", de: "hauptseite" }, lang)} &#8599;
+        </a>
         <div className="edu-home-controls">
           <ThemeLangControls />
           <button

@@ -477,6 +477,18 @@
   gap: var(--sp-3);
   flex-wrap: wrap;
 }
+/* the one link out of the app: back to the marketing site */
+.edu-home-mainlink {
+  color: var(--text-dim);
+  font-size: var(--fs-14);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--t-fast);
+}
+.edu-home-mainlink:hover,
+.edu-home-mainlink:focus-visible {
+  color: var(--text);
+}
 
 .edu-home-wrap {
   max-width: 1000px;
