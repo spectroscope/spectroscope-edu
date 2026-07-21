@@ -123,16 +123,9 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
               lang,
             )}
           </p>
-          <div className="edu-home-cta">
-            <button type="button" className="soft-primary" onClick={() => props.onEnter("simulator")}>
-              {t({ en: "open the simulator", de: "simulator öffnen" }, lang)}
-            </button>
-            <button type="button" className="ghost" onClick={() => props.onEnter("edu")}>
-              {t({ en: "browse edu", de: "edu ansehen" }, lang)}
-            </button>
-          </div>
         </header>
 
+        {/* the two previews ARE the calls to action — each carries a click arrow */}
         <div className="edu-home-guides">
           <SimGuide onEnter={props.onEnter} />
           <EduGuide onEnter={props.onEnter} />

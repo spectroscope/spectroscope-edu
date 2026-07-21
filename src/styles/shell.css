@@ -675,6 +675,7 @@
   }
 }
 .edu-home-sim {
+  position: relative;
   display: block;
   width: 100%;
   margin: 0;
@@ -684,6 +685,33 @@
   text-align: left;
   font: inherit;
   cursor: pointer;
+}
+/* each preview IS the call to action: a click arrow over its top-right corner,
+   subtle by default and filled on hover/focus. */
+.edu-home-sim::after {
+  content: "→";
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+.edu-home-sim:hover::after,
+.edu-home-sim:focus-visible::after {
+  background: var(--accent);
+  color: var(--bg);
+  transform: translateX(2px);
 }
 .edu-home-sim-svg {
   display: block;
