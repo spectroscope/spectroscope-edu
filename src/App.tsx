@@ -53,6 +53,19 @@ export function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  // First-ever open of the app (any view — it is one app): show the keymap once so
+  // the shortcuts are discovered, then remember it so it never auto-opens again.
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem("spectroscope:keymapSeen")) {
+        setKeymapOpen(true);
+        localStorage.setItem("spectroscope:keymapSeen", "1");
+      }
+    } catch {
+      /* localStorage unavailable (private mode) — just skip the one-time intro */
+    }
+  }, []);
+
   return (
     <>
       {view === "home" ? (
