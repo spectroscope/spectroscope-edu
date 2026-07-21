@@ -13,8 +13,8 @@ export function EduView() {
         <h1>{lang === "de" ? "die lektionen entstehen" : "the lessons are on their way"}</h1>
         <p>
           {lang === "de"
-            ? "sieben interaktive lektionen landen hier — nativ in react flow neu gebaut. bis dahin: öffne den simulator und sieh einem gescripteten agenten-lauf Schritt für Schritt zu."
-            : "seven interactive lessons land here — rebuilt natively on react flow. until then, open the simulator and watch a scripted agent run step by step."}
+            ? "sieben interaktive lektionen landen hier, nativ in react flow neu gebaut. bis dahin: öffne den simulator und sieh einem gescripteten agenten-lauf schritt für schritt zu."
+            : "seven interactive lessons land here, rebuilt natively on react flow. until then, open the simulator and watch a scripted agent run step by step."}
         </p>
       </div>
     </section>
