@@ -7,11 +7,12 @@
 import { useEffect, useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { SimView } from "./SimView";
-import { EduView } from "./EduView";
+import { EduView } from "./edu/EduView";
 import { EduHome } from "./EduHome";
 import { Keymap } from "./Keymap";
 import { navigate, useView } from "./state/route";
 import { SCENARIOS } from "./scenario/registry";
+import { LESSONS } from "./edu/lessons";
 
 export type { Nav, View } from "./state/route";
 
@@ -26,6 +27,7 @@ function isTyping(target: EventTarget | null): boolean {
 export function App() {
   const view = useView();
   const [scenarioId, setScenarioId] = useState<string>(SCENARIOS[0].id);
+  const [eduLessonId, setEduLessonId] = useState<string>(LESSONS[0].id);
   const [keymapOpen, setKeymapOpen] = useState(false);
 
   // Global shortcuts: ? toggles the keymap, Esc closes it, h goes home.
@@ -62,12 +64,17 @@ export function App() {
               setScenarioId(id);
               navigate("simulator");
             }}
+            eduLessonId={eduLessonId}
+            onSelectLesson={(id) => {
+              setEduLessonId(id);
+              navigate("edu");
+            }}
           />
           <main className="edu-stage">
             {view === "simulator" ? (
               <SimView scenarioId={scenarioId} onOpenKeymap={() => setKeymapOpen(true)} />
             ) : (
-              <EduView />
+              <EduView lessonId={eduLessonId} />
             )}
           </main>
         </div>

@@ -7,3 +7,4 @@
 @import "./styles/panels.css"; /* trace view (the causal-chain wire view) + agent badges */
 @import "./styles/surfaces.css"; /* explain panel (the why layer docked in the trace) */
 @import "./styles/shell.css"; /* edu shell: home, sidebar switch, stage, drawers, fx-switch */
+@import "./styles/edu.css"; /* the interactive edu lessons (canvas, nodes, readout, controller) */
