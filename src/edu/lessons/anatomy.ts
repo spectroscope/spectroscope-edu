@@ -217,6 +217,8 @@ export const anatomy: RevealLesson = {
     },
     {
       show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "sub-explore", "skills", "hooks", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net", "e_agent_sub", "e_skills", "e_hooks"],
+      // keep the generated-image panel on the final step too — it reads nicely.
+      patch: { agent: { activeTool: "generate_image", tool: { name: "generate_image", input: { prompt: "a diagram of the retry flow" } } } },
       cap: {
         en: "none of this is in the model's <span class='k'>weights</span>. all of it is engineering <span class='k'>around</span> the model, and that engineering is the harness. click any card to inspect it, then meet the same cards live in the simulator.",
         de: "nichts davon steckt in den <span class='k'>gewichten</span> des modells. alles ist engineering <span class='k'>um</span> das modell herum, und dieses engineering ist der harness. klick jede karte an, dann triff dieselben karten live im simulator.",
