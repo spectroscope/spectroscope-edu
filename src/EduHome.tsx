@@ -107,13 +107,18 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
 
       <div className="edu-home-wrap">
         <header className="edu-home-hero">
-          <p className="eyebrow sand">{t({ en: "learn what you're watching", de: "verstehe, was du beobachtest" }, lang)}</p>
+          <div className="edu-hero-brand">
+            <img className="edu-hero-mark" src={mark} alt="" />
+            <span className="edu-hero-name">spectroscope</span>
+            <span className="edu-hero-sub">edu</span>
+          </div>
+          <p className="eyebrow sand">{t({ en: "the edu portal · learn what you're watching", de: "das edu-portal · verstehe, was du beobachtest" }, lang)}</p>
           <h1>{t({ en: "how an agent actually works", de: "wie ein agent wirklich arbeitet" }, lang)}</h1>
           <p className="edu-home-lede">
             {t(
               {
-                en: "spectroscope is the agent orchestrator you can watch. this is where you learn what the lines mean. step through a scripted agent run with no backend, or work through the lessons. nothing to install.",
-                de: "spectroscope ist der agent-orchestrator, den man beobachten kann. hier lernst du, was die linien bedeuten. geh einen gescripteten agenten-lauf ohne backend durch oder arbeite die lektionen durch. nichts zu installieren.",
+                en: "this is the edu portal, the teaching companion to spectroscope, the agent orchestrator you can watch. here you learn what the lines mean: step through a scripted agent run with no backend, or work through the lessons. nothing to install.",
+                de: "das ist das edu-portal, der lern-begleiter zu spectroscope, dem agent-orchestrator, den man beobachten kann. hier lernst du, was die linien bedeuten: geh einen gescripteten agenten-lauf ohne backend durch oder arbeite die lektionen durch. nichts zu installieren.",
               },
               lang,
             )}

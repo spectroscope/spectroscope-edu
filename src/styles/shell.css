@@ -488,6 +488,34 @@
   max-width: 680px;
   padding: clamp(var(--sp-6), 9vh, calc(var(--sp-7) * 1.6)) 0 var(--sp-6);
 }
+/* the prominent brand lockup at the top of the hero: mark + spectroscope + edu */
+.edu-hero-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+.edu-hero-mark {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+.edu-hero-name {
+  font-size: var(--fs-20);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.edu-hero-sub {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
 .edu-home-hero h1 {
   margin: var(--sp-3) 0 var(--sp-4);
   font-size: clamp(var(--fs-28), 5vw, 42px);
