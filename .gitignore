@@ -7,3 +7,6 @@ coverage/
 
 # local-only design docs (not shipped to the repo)
 docs/
+
+# local-only agent instructions (not shipped to the repo)
+CLAUDE.md
