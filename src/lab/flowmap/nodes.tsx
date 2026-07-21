@@ -170,45 +170,58 @@ export function AgentNode({ data }: NodeProps) {
       </div>
     </>
   );
+  // a generated image has no competing right-column JSON, so in the wide edu
+  // layout it spans BOTH columns (full card width) — the prompt reads clearly.
+  const isGenImage = d.tool?.name === "generate_image";
+  const sysPanel = d.systemPrompt ? (
+    <div className="pf-panelbox">
+      <div className="pf-panelbox__label">{t(lang, "map.ctx.systemPrompt")}</div>
+      <div className="pf-prose nowheel" style={{ textAlign: "left" }}>{d.systemPrompt}</div>
+    </div>
+  ) : null;
+  const ctxBarsPanel =
+    d.ctxParts && d.ctxTotals ? (
+      <div className="pf-panelbox">
+        <div className="pf-panelbox__label">{t(lang, "map.ctx.toLlm")} · {d.ctxTotals.estimatedTokens.toLocaleString()} / {d.ctxTotals.threshold.toLocaleString()} tok</div>
+        <div className="pf-ctx">
+          {d.ctxParts.map((p) => (
+            <div className="pf-ctx__row" key={p.label}>
+              <span>{p.label}</span>
+              <span className="pf-ctx__bar"><span className="pf-ctx__fill" style={{ width: `${(p.estTokens / maxTok) * 100}%` }} /></span>
+              <span className="pf-ctx__tok">{p.estTokens}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : null;
+  const genImagePanel =
+    d.tool && isGenImage ? (
+      <div className="pf-panelbox pf-genimg-panel">
+        <div className="pf-panelbox__label">{t(lang, "map.ctx.toolCall")} · {d.tool.name}</div>
+        <div className="pf-genimg-wrap">
+          <GenImage />
+          <span className="pf-genimg-cap">{String((d.tool.input as { prompt?: string })?.prompt ?? "a generated image")}</span>
+        </div>
+      </div>
+    ) : null;
+  const jsonToolPanel =
+    d.tool && !isGenImage ? (
+      <div className="pf-panelbox">
+        <div className="pf-panelbox__label">{t(lang, "map.ctx.toolCall")} · {d.tool.name}</div>
+        <div className="nowheel" style={{ maxHeight: 150, overflow: "auto" }}>
+          <JsonTree value={d.tool.input} defaultDepth={3} />
+        </div>
+      </div>
+    ) : null;
+  const noToolPanel = d.tool ? null : <div className="pf-kv">{t(lang, "map.ctx.noTool")}</div>;
+  // stacked (simulator / collapsed): everything inline, the image among the rest.
   const ctxPanels = (
     <>
-      {d.systemPrompt && (
-        <div className="pf-panelbox">
-          <div className="pf-panelbox__label">{t(lang, "map.ctx.systemPrompt")}</div>
-          <div className="pf-prose nowheel" style={{ textAlign: "left" }}>{d.systemPrompt}</div>
-        </div>
-      )}
-      {d.ctxParts && d.ctxTotals && (
-        <div className="pf-panelbox">
-          <div className="pf-panelbox__label">{t(lang, "map.ctx.toLlm")} · {d.ctxTotals.estimatedTokens.toLocaleString()} / {d.ctxTotals.threshold.toLocaleString()} tok</div>
-          <div className="pf-ctx">
-            {d.ctxParts.map((p) => (
-              <div className="pf-ctx__row" key={p.label}>
-                <span>{p.label}</span>
-                <span className="pf-ctx__bar"><span className="pf-ctx__fill" style={{ width: `${(p.estTokens / maxTok) * 100}%` }} /></span>
-                <span className="pf-ctx__tok">{p.estTokens}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {d.tool ? (
-        <div className="pf-panelbox">
-          <div className="pf-panelbox__label">{t(lang, "map.ctx.toolCall")} · {d.tool.name}</div>
-          {d.tool.name === "generate_image" ? (
-            <div className="pf-genimg-wrap">
-              <GenImage />
-              <span className="pf-genimg-cap">{String((d.tool.input as { prompt?: string })?.prompt ?? "a generated image")}</span>
-            </div>
-          ) : (
-            <div className="nowheel" style={{ maxHeight: 150, overflow: "auto" }}>
-              <JsonTree value={d.tool.input} defaultDepth={3} />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="pf-kv">{t(lang, "map.ctx.noTool")}</div>
-      )}
+      {sysPanel}
+      {ctxBarsPanel}
+      {genImagePanel}
+      {jsonToolPanel}
+      {noToolPanel}
     </>
   );
 
@@ -217,17 +230,24 @@ export function AgentNode({ data }: NodeProps) {
       {head}
       {expandAll ? (
         // edu: the context sits BESIDE the controls (wider card, not a tall stack).
-        <div className="pf-agent__cols">
-          <div className="pf-agent__main">
-            {loopRow}
-            {gateRow}
-            {toolsBlock}
+        // A generated image spans both columns underneath — no JSON competes with it.
+        <>
+          <div className="pf-agent__cols">
+            <div className="pf-agent__main">
+              {loopRow}
+              {gateRow}
+              {toolsBlock}
+            </div>
+            <div className="pf-agent__ctx">
+              <div className="pf-eyebrow">{t(lang, "map.disc.context")}</div>
+              {sysPanel}
+              {ctxBarsPanel}
+              {jsonToolPanel}
+              {noToolPanel}
+            </div>
           </div>
-          <div className="pf-agent__ctx">
-            <div className="pf-eyebrow">{t(lang, "map.disc.context")}</div>
-            {ctxPanels}
-          </div>
-        </div>
+          {genImagePanel && <div className="pf-agent__genfull">{genImagePanel}</div>}
+        </>
       ) : (
         <>
           {loopRow}
