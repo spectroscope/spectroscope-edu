@@ -74,7 +74,7 @@ export function App() {
             {view === "simulator" ? (
               <SimView scenarioId={scenarioId} onOpenKeymap={() => setKeymapOpen(true)} />
             ) : (
-              <EduView lessonId={eduLessonId} />
+              <EduView key={eduLessonId} lessonId={eduLessonId} />
             )}
           </main>
         </div>

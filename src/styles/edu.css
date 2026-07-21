@@ -1,7 +1,10 @@
 /* ============================================================
-   edu lessons — ported from the vanilla prototype's styles. Colors come from
-   tokens.css (identical names). Color only on the spectral marks + edges,
-   lowercase labels, no shadows, .pulse for live, tabular numbers.
+   edu lessons — the teaching layer over the simulator's rendering world.
+   The map is EduFlow (the sim's own React Flow cards); this file styles the
+   lesson shell (head / stage / readout / controller), the edu abstraction card
+   (harness parts the live map has no node for), and keeps the readout inner
+   styles. Colour only on the spectral marks + edges, lowercase labels, no
+   shadows, tabular numbers.
    ============================================================ */
 
 .edu-view {
@@ -26,9 +29,10 @@
 }
 .edu-blurb {
   margin: var(--sp-1) 0 0;
-  max-width: 66ch;
+  max-width: 74ch;
   color: var(--text-dim);
   font-size: var(--fs-12);
+  line-height: 1.5;
 }
 
 .edu-lesson-stage {
@@ -37,166 +41,104 @@
   grid-template-columns: 1fr 288px;
   min-height: 0;
 }
+.edu-lesson-stage.no-readout {
+  grid-template-columns: 1fr;
+}
 
-/* ---- canvas (pan/zoom over a 980x540 world) ---- */
-.edu-canvas {
+/* ---- the teaching canvas (EduFlow = the sim's cards, locked down) ---- */
+.edu-map {
   position: relative;
-  overflow: hidden;
-  cursor: grab;
-  touch-action: none;
-  background:
-    radial-gradient(circle at 1px 1px, var(--hairline) 1px, transparent 0) 0 0 / 26px 26px,
-    var(--bg);
-}
-.edu-world {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 980px;
-  height: 540px;
-  transform-origin: top left;
-}
-.edu-edges {
-  position: absolute;
-  inset: 0;
-  width: 980px;
-  height: 540px;
-  overflow: visible;
-  pointer-events: none;
-}
-.edu-zoom {
-  position: absolute;
-  left: var(--sp-3);
-  bottom: var(--sp-3);
+  min-width: 0;
+  min-height: 0;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  z-index: 5;
+  padding: var(--sp-3);
 }
-.edu-zoom button {
-  width: 30px;
-  height: 30px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-chip);
-  background: var(--surface);
-  color: var(--text-dim);
-  font-size: 15px;
-  line-height: 1;
-  font-family: var(--font-mono);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: border-color var(--t-fast), color var(--t-fast);
-}
-.edu-zoom button:hover {
-  border-color: var(--border-strong);
-  color: var(--text);
-}
-.edu-zoom-hint {
-  position: absolute;
-  right: var(--sp-3);
-  bottom: var(--sp-3);
-  z-index: 5;
-  font-size: 9.5px;
-  letter-spacing: 0.06em;
-  color: var(--text-faint);
-  opacity: 0.7;
-  pointer-events: none;
+/* relax the Lab's .lab-flowmap { min-height: 540px } so the map fills the cell
+   without forcing overflow on a short viewport. */
+.edu-map .edu-flowmap {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-/* ---- edges ---- */
-.edge {
-  fill: none;
-  stroke: var(--border-strong);
-  stroke-width: 1.6;
-  opacity: 0.5;
-  transition: opacity var(--t-fast);
+/* ---- edu abstraction card — a React Flow node for harness parts the live map
+   has no card for (skills / hooks / the loop). Drawn in the sim's language. ---- */
+.pf-flow .react-flow__node-eduCard {
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: auto;
+  font-size: inherit;
+  color: inherit;
 }
-.edge.is-applied { opacity: 0.85; }
-.edge.is-active {
-  stroke-width: 2.4;
-  opacity: 1;
-  stroke-dasharray: 6 6;
-  animation: edu-flow 0.6s linear infinite;
-}
-.edge.is-dashed { stroke-dasharray: 2 4; opacity: 0.4; stroke-width: 1.2; }
-.edge-label { font-family: var(--font-mono); font-size: 10px; fill: var(--text-faint); letter-spacing: 0.04em; }
-.edge-label.hot { fill: var(--text-dim); }
-@keyframes edu-flow { to { stroke-dashoffset: -24; } }
-
-/* ---- nodes ---- */
-.edu-node {
-  position: absolute;
+.edu-card {
+  position: relative;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: var(--radius-chip);
-  padding: 9px 12px;
-  overflow: hidden;
+  border-radius: var(--radius-card);
+  padding: 10px 13px 11px;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  transition: border-color var(--t-fast), opacity var(--t-fast);
+  width: 200px;
+  font-family: var(--font-ui);
+  text-align: left;
+  transition: border-color var(--t-fast);
 }
-.edu-node::before {
+.edu-card::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   width: 3px;
+  border-radius: var(--radius-card) 0 0 var(--radius-card);
   background: var(--text-faint);
-  opacity: 0.85;
+  opacity: 0.9;
 }
-.edu-node.k-model::before { background: var(--ev-tool); }
-.edu-node.k-harness::before { background: var(--text-faint); }
-.edu-node.k-gate::before { background: var(--ev-gate); }
-.edu-node.k-log::before { background: var(--ev-reasoning); }
-.edu-node.k-token::before { background: var(--ev-token); }
-.edu-node.k-sub::before { background: var(--ev-subagent); }
-.edu-node.k-human::before { background: var(--sand); }
-.edu-node.k-skill::before { background: var(--ev-tool); }
-.edu-node .n-eyebrow {
+.edu-card.k-model::before { background: var(--ev-tool); }
+.edu-card.k-harness::before { background: var(--text-faint); }
+.edu-card.k-gate::before { background: var(--ev-gate); }
+.edu-card.k-log::before { background: var(--ev-reasoning); }
+.edu-card.k-token::before { background: var(--ev-token); }
+.edu-card.k-sub::before { background: var(--ev-subagent); }
+.edu-card.k-human::before { background: var(--sand); }
+.edu-card.k-skill::before { background: var(--ev-tool); }
+.edu-card.is-active { border-color: var(--accent); }
+.edu-card-eyebrow {
   font-family: var(--font-mono);
   font-size: 8.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
-.edu-node .n-title { font-size: 13px; color: var(--text); line-height: 1.2; }
-.edu-node .n-sub { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-dim); }
-.edu-node.is-active { border-color: var(--accent); }
-.edu-node .ring {
-  position: absolute;
-  inset: -4px;
-  border: 1.5px solid var(--accent);
-  border-radius: 10px;
-  opacity: 0;
-  transition: opacity var(--t-fast);
-  pointer-events: none;
-}
-.edu-node.is-active .ring { opacity: 1; }
-.edu-node.has-detail { cursor: pointer; }
-.node-hint {
+.edu-card-title { font-size: 13px; color: var(--text); line-height: 1.25; }
+.edu-card-sub { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-dim); }
+.edu-card-inspect {
+  align-self: flex-start;
+  margin-top: 3px;
+  border: none;
+  background: none;
+  padding: 0;
   font-family: var(--font-mono);
-  font-size: 8.5px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
   color: var(--text-faint);
-  margin-top: 1px;
+  cursor: pointer;
   transition: color var(--t-fast);
 }
-.edu-node.has-detail:hover .node-hint,
-.edu-node.is-active .node-hint { color: var(--accent); }
-.node-detail {
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: opacity 0.3s, max-height 0.34s;
+.edu-card.is-active .edu-card-inspect,
+.edu-card-inspect:hover { color: var(--accent); }
+.edu-card-detail {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
 }
-.edu-node.expanded .node-detail { opacity: 1; max-height: 220px; margin-top: 6px; }
-.node-detail .dl {
+.edu-card-detail li {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--text-dim);
@@ -204,56 +146,9 @@
   padding-left: 8px;
   border-left: 2px solid var(--border-strong);
 }
-
-/* token budget (four moves) */
-.budget { display: flex; flex-direction: column; gap: 6px; }
-.budget-cells { display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; }
-.cell {
-  height: 9px;
-  border-radius: 2px;
-  border: 1px solid var(--border-strong);
-  background: transparent;
-  transition: background var(--t-fast), border-color var(--t-fast);
-}
-.cell.on { background: var(--ev-token); border-color: var(--ev-token); }
-.budget-meta { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); }
-
-/* context stack (inside the window) */
-.edu-node.k-stack { padding: 0; }
-.cs-head { padding: 11px 13px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 7px; }
-.cs-title { font-size: 13px; color: var(--text); }
-.cs-gauge { height: 6px; border-radius: 3px; background: var(--surface-3); overflow: hidden; }
-.cs-gauge > i { display: block; height: 100%; width: 0; background: var(--ok); transition: width 0.4s var(--ease-out), background 0.3s; }
-.cs-gauge.warn > i { background: var(--warn); }
-.cs-gauge.error > i { background: var(--error); }
-.cs-total { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); display: flex; justify-content: space-between; }
-.cs-total .st { text-transform: uppercase; letter-spacing: 0.1em; }
-.cs-total .st.warn { color: var(--warn); }
-.cs-total .st.error { color: var(--error); }
-.cs-total .st.ok { color: var(--ok); }
-.cs-rows { padding: 9px 13px 11px; display: flex; flex-direction: column; gap: 6px; }
-.seg-row { display: grid; grid-template-columns: 104px 1fr 40px; gap: 9px; align-items: center; font-family: var(--font-mono); font-size: 10px; }
-.seg-lbl { color: var(--text-dim); }
-.seg-row.base .seg-lbl { color: var(--text-faint); }
-.seg-row.hot .seg-lbl { color: var(--text); }
-.seg-bar { height: 9px; border-radius: 2px; background: var(--surface-3); overflow: hidden; }
-.seg-bar > i { display: block; height: 100%; width: 0; border-radius: 2px; transition: width 0.4s var(--ease-out); }
-.seg-tok { text-align: right; color: var(--text-faint); }
-
-/* skill body (progressive disclosure) */
-.skill-body {
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: opacity 0.3s, max-height 0.34s var(--ease-out);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.edu-node.expanded .skill-body { opacity: 1; max-height: 160px; margin-top: 4px; }
-.skill-step { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); display: flex; gap: 6px; }
-.skill-step b { color: var(--accent); font-weight: 600; }
-.skill-cost { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-faint); margin-top: 2px; }
+.edu-card-body { margin-top: 5px; display: flex; flex-direction: column; gap: 4px; }
+.edu-card-body-row { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); display: flex; gap: 6px; line-height: 1.35; }
+.edu-card-body-n { color: var(--accent); font-weight: 600; flex: none; }
 
 /* ---- readout ---- */
 .edu-readout {
@@ -309,8 +204,22 @@
   gap: 9px;
   flex: none;
 }
-.edu-controller .caption { font-size: 13.5px; color: var(--text); line-height: 1.5; min-height: 2.4em; max-width: 88ch; }
+/* The caption is the ONE region that absorbs pressure: capped + scrollable, so a
+   long caption / the predict row can never push the transport off a short view
+   (the whole caption-clip fix). The controls stay flex:none and always visible. */
+.edu-controller .caption {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 2.4em;
+  max-height: 7.5em;
+  overflow-y: auto;
+  max-width: 92ch;
+}
 .edu-controller .caption .k { color: var(--accent); font-family: var(--font-mono); font-size: 12px; }
+.edu-controller .caption .a { color: var(--accent); }
+.edu-controller .caption .g { color: var(--ok); }
+.edu-controller .caption .r { color: var(--error); }
 .edu-ctrl-row { display: flex; align-items: center; gap: 14px; }
 .edu-ctrl-btns { display: flex; gap: 6px; flex: none; }
 .edu-ctrl-btns button {
@@ -325,15 +234,16 @@
   font-size: var(--fs-16);
   line-height: 1;
   cursor: pointer;
+  background: var(--surface);
   transition: border-color var(--t-fast), color var(--t-fast);
 }
 .edu-ctrl-btns button:hover:not(:disabled) { border-color: var(--border-strong); color: var(--text); }
 .edu-ctrl-btns button:disabled { opacity: 0.4; cursor: default; }
-.edu-ctrl-btns button.play { border-color: var(--accent); color: var(--accent); }
+.edu-ctrl-btns button.play:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 .edu-scrub { flex: 1; display: flex; align-items: center; gap: 12px; }
 .edu-scrub input[type="range"] { flex: 1; accent-color: var(--accent); cursor: pointer; }
 .counter { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-dim); white-space: nowrap; }
-.done-flag { font-family: var(--font-mono); font-size: 11px; color: var(--ok); display: inline-flex; align-items: center; gap: 6px; }
+.done-flag { font-family: var(--font-mono); font-size: 11px; color: var(--ok); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 
 /* ---- predict-then-reveal ---- */
 .predict { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -346,10 +256,11 @@
   color: var(--text);
   font-family: var(--font-mono);
   cursor: pointer;
+  background: var(--surface);
   transition: border-color var(--t-fast), color var(--t-fast);
 }
 .predict button:hover:not(:disabled) { border-color: var(--accent); }
-.predict button.reveal { border-color: var(--ok); color: var(--ok); background: transparent; }
+.predict button.reveal { border-color: var(--ok); color: var(--ok); }
 .predict button.wrong { border-color: var(--error); color: var(--error); opacity: 0.7; text-decoration: line-through; }
 .predict button:disabled { cursor: default; }
 

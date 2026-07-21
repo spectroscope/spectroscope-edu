@@ -3,7 +3,7 @@
 // cost (tokens in window), gives (what the harness adds). Ported from the
 // prototype's renderReadout. Log/note strings carry inline HTML, rendered as-is.
 
-import type { EduLesson, Loc } from "./lessons";
+import type { EduLesson, Loc } from "./model";
 
 const ll = (v: Loc | undefined, de: boolean): string =>
   v == null ? "" : typeof v === "string" ? v : de ? v.de ?? v.en : v.en;
