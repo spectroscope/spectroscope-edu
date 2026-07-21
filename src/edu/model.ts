@@ -65,6 +65,8 @@ export interface EduCardData {
   detail?: Loc[];
   /** progressive-disclosure body (loads/《expands》on match). */
   body?: { n: string; t: Loc }[];
+  /** a workspace file listing (durable state on disk); isNew highlights a fresh write. */
+  files?: { name: string; isNew?: boolean }[];
   expanded?: boolean;
   active?: boolean;
   [k: string]: unknown;
@@ -104,6 +106,9 @@ export interface RevealEdge {
 export interface EduStep {
   cap: Loc;
   predict?: EduPredict;
+  /** optional "what is happening now" line for the status bar (reveal lessons;
+   *  scenario lessons derive it from the folded scene). */
+  now?: Loc;
 
   // readout feeds (identical to the shipped EduReadout contracts)
   win?: { tok: Record<string, number>; state?: "ok" | "warn" | "error" };

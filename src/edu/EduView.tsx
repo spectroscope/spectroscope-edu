@@ -123,6 +123,11 @@ export function EduView({ lessonId }: { lessonId: string }) {
 
       <div className={`edu-lesson-stage${lesson.readoutKind === "none" ? " no-readout" : ""}`}>
         <div className="edu-map">
+          <div className="edu-now" aria-live="polite">
+            <span className="edu-now-tag">{de ? "gerade" : "now"}</span>
+            <span className="edu-now-dot" />
+            <span className="edu-now-label">{ll(frame?.now, de)}</span>
+          </div>
           <EduFlow nodes={frame?.nodes ?? []} edges={frame?.edges ?? []} fitSignal={step} layoutKey={layoutKey} />
         </div>
         {lesson.readoutKind !== "none" && (

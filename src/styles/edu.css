@@ -60,6 +60,30 @@
   min-height: 0;
 }
 
+/* ---- the live "now" bar: spans the map, hovers over everything, always shows
+   what the agent is doing this step ---- */
+.edu-now {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 15px;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  backdrop-filter: blur(7px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  pointer-events: none;
+}
+.edu-now-tag { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-faint); flex: none; }
+.edu-now-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; animation: edu-nowpulse 1.6s ease-in-out infinite; }
+.edu-now-label { font-family: var(--font-mono); font-size: 12.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes edu-nowpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .edu-now-dot { animation: none; } }
+
 /* ---- edu abstraction card — a React Flow node for harness parts the live map
    has no card for (skills / hooks / the loop). Drawn in the sim's language. ---- */
 .pf-flow .react-flow__node-eduCard {
@@ -276,6 +300,25 @@
 .pf-agent__main { flex: 0 0 200px; display: flex; flex-direction: column; }
 .pf-agent__ctx { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 8px; border-left: 1px solid var(--border); padding-left: 16px; }
 .pf-agent__ctx > .pf-eyebrow { margin-bottom: 2px; }
+
+/* the generated-image thumbnail in the agent's context column */
+.pf-genimg-wrap { display: flex; align-items: center; gap: 10px; margin-top: 2px; }
+.pf-genimg { border-radius: 5px; flex: none; }
+.pf-genimg-cap { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); line-height: 1.3; }
+
+/* edu: the user card with the prompt BESIDE it (column layout, like the agent) */
+.edu-flowmap .pf-user--wide { width: 400px; }
+.pf-user--wide { display: flex; gap: 16px; align-items: flex-start; text-align: left; }
+.pf-user__col { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pf-user__prompt { flex: 1 1 auto; min-width: 0; border-left: 1px solid var(--border); padding-left: 16px; }
+.pf-user__prompt > .pf-eyebrow { margin-bottom: 4px; }
+
+/* edu: a workspace card — the files that live on disk */
+.edu-card-files { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.edu-card-files li { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-dim); display: flex; align-items: center; gap: 7px; }
+.edu-card-files li::before { content: ""; width: 9px; height: 11px; border-radius: 1.5px; border: 1px solid var(--text-faint); flex: none; }
+.edu-card-files li.is-new { color: var(--text); }
+.edu-card-files li.is-new::before { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 30%, transparent); }
 
 /* ---- error boundary fallback (never white-screen the whole app) ---- */
 .err-boundary { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: var(--sp-6); }

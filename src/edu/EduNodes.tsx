@@ -72,6 +72,14 @@ function EduCard({ data }: NodeProps) {
           ))}
         </div>
       )}
+
+      {Array.isArray(d.files) && d.files.length > 0 && (
+        <ul className="edu-card-files nowheel">
+          {d.files.map((f) => (
+            <li key={f.name} className={f.isNew ? "is-new" : ""}>{f.name}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

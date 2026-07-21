@@ -68,6 +68,25 @@ export const anatomy: RevealLesson = {
     "os-shell": { id: "os-shell", type: "os", x: 360, y: 660, data: os("shell", { command: null }) },
     "os-mcp": { id: "os-mcp", type: "os", x: 600, y: 660, data: os("mcp", { mcp: null, tool: null }) },
     "os-net": { id: "os-net", type: "os", x: 840, y: 660, data: os("net") },
+    workspace: {
+      id: "workspace",
+      type: "eduCard",
+      x: 1060,
+      y: 636,
+      w: 240,
+      data: {
+        kind: "log",
+        eyebrow: "workspace",
+        title: { en: "your files on disk", de: "deine dateien auf disk" },
+        sub: { en: "durable, survives the session", de: "dauerhaft, überlebt die session" },
+        files: [
+          { name: "CLAUDE.md" },
+          { name: "src/http/client.ts", isNew: true },
+          { name: "docs/SPEC.md" },
+          { name: "session.jsonl" },
+        ],
+      },
+    },
     "sub-explore": { id: "sub-explore", type: "subagent", x: 940, y: 300, data: sub },
     skills: {
       id: "skills",
@@ -137,7 +156,7 @@ export const anatomy: RevealLesson = {
       reveal: [{ l: { en: "context discipline", de: "kontext-disziplin" }, s: { en: "assembly · just-in-time loading · compaction", de: "zusammenbau · bedarfsladen · compaction" } }],
     },
     {
-      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
+      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
       activeNodes: ["os-disk", "os-shell", "os-mcp", "os-net"],
       activeEdges: ["e_agent_shell"],
       cap: {
@@ -147,7 +166,7 @@ export const anatomy: RevealLesson = {
       reveal: [{ l: { en: "tool access", de: "tool-zugriff" }, s: { en: "a registry: validate, execute, feed back", de: "eine registry: prüfen, ausführen, zurückspeisen" } }],
     },
     {
-      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
+      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
       activeNodes: ["agent"],
       cap: {
         en: "but nothing side-effecting runs until it passes the <span class='k'>permission gate</span> on the agent: allow, ask, or deny, sorted by blast radius. it is the one write path, and a denial is an observation too.",
@@ -156,7 +175,7 @@ export const anatomy: RevealLesson = {
       reveal: [{ l: { en: "guardrails", de: "leitplanken" }, s: { en: "permissions · sandboxing · deny rules", de: "permissions · sandboxing · deny-regeln" } }],
     },
     {
-      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
+      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
       activeNodes: ["agent", "llm"],
       activeEdges: ["e_agent_llm"],
       cap: {
@@ -166,7 +185,7 @@ export const anatomy: RevealLesson = {
       reveal: [{ l: { en: "persistence", de: "persistenz" }, s: { en: "state survives turns, sessions, restarts", de: "zustand überlebt runden, sessions, neustarts" } }],
     },
     {
-      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
+      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
       activeNodes: ["os-disk"],
       activeEdges: ["e_agent_disk"],
       cap: {
@@ -176,7 +195,7 @@ export const anatomy: RevealLesson = {
       reveal: [{ l: { en: "audit trail", de: "audit-spur" }, s: { en: "append-only JSONL, replayable history", de: "append-only JSONL, abspielbare historie" } }],
     },
     {
-      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
+      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net"],
       activeNodes: ["user"],
       activeEdges: ["e_user_agent"],
       cap: {
@@ -186,17 +205,18 @@ export const anatomy: RevealLesson = {
       reveal: [{ l: { en: "model routing", de: "model-routing" }, s: { en: "cheap for narrow steps, strong for judgement", de: "günstig für enge schritte, stark fürs urteil" } }],
     },
     {
-      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "sub-explore", "skills", "hooks", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net", "e_agent_sub", "e_skills", "e_hooks"],
+      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "sub-explore", "skills", "hooks", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net", "e_agent_sub", "e_skills", "e_hooks"],
       activeNodes: ["skills", "hooks", "sub-explore", "os-mcp"],
       activeEdges: ["e_agent_sub"],
+      patch: { agent: { activeTool: "generate_image", tool: { name: "generate_image", input: { prompt: "a diagram of the retry flow" } } } },
       cap: {
-        en: "and it is <span class='k'>extensible</span>: skills (saved instructions), hooks (fixed checkpoints), mcp (connected systems), subagents (isolated helpers with their own window). each one plugs into the same loop.",
-        de: "und es ist <span class='k'>erweiterbar</span>: skills (gespeicherte anweisungen), hooks (feste checkpoints), mcp (angebundene systeme), subagenten (isolierte helfer mit eigenem fenster). jedes klinkt sich in dieselbe loop ein.",
+        en: "and it is <span class='k'>extensible</span>: skills, hooks, mcp, subagents, and richer actions the harness adds, <span class='k'>use_skill · call_mcp · generate_image</span> (here it generated a diagram, see the thumbnail). each one plugs into the same loop.",
+        de: "und es ist <span class='k'>erweiterbar</span>: skills, hooks, mcp, subagenten, und reichere aktionen, die der harness ergänzt, <span class='k'>use_skill · call_mcp · generate_image</span> (hier hat es ein diagramm erzeugt, siehe die vorschau). jedes klinkt sich in dieselbe loop ein.",
       },
       reveal: [{ l: { en: "delegation", de: "delegation" }, s: { en: "subagents, teams, isolated windows", de: "subagenten, teams, isolierte fenster" } }],
     },
     {
-      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "sub-explore", "skills", "hooks", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net", "e_agent_sub", "e_skills", "e_hooks"],
+      show: ["z-mac", "z-os", "user", "agent", "llm", "os-disk", "os-shell", "os-mcp", "os-net", "workspace", "sub-explore", "skills", "hooks", "e_user_agent", "e_agent_llm", "e_agent_disk", "e_agent_shell", "e_agent_mcp", "e_agent_net", "e_agent_sub", "e_skills", "e_hooks"],
       cap: {
         en: "none of this is in the model's <span class='k'>weights</span>. all of it is engineering <span class='k'>around</span> the model, and that engineering is the harness. click any card to inspect it, then meet the same cards live in the simulator.",
         de: "nichts davon steckt in den <span class='k'>gewichten</span> des modells. alles ist engineering <span class='k'>um</span> das modell herum, und dieses engineering ist der harness. klick jede karte an, dann triff dieselben karten live im simulator.",

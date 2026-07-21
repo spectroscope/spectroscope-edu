@@ -11,9 +11,9 @@ import type { Node, Edge } from "@xyflow/react";
 import type { RunEvent } from "../events";
 import type { Lang } from "../i18n/i18n";
 import { compile } from "../scenario/compile";
-import { advanceScene, initialScene, isLocalProvider } from "../lab/labScene";
+import { advanceScene, initialScene, isLocalProvider, type Scene } from "../lab/labScene";
 import { deriveDetail, sceneToFlow } from "../lab/flowmap/sceneToFlow";
-import type { EduLesson, EduStep, RevealEdge, RevealLesson, RevealNode, ScenarioLesson } from "./model";
+import type { EduLesson, EduStep, Loc, RevealEdge, RevealLesson, RevealNode, ScenarioLesson } from "./model";
 
 export interface Frame {
   nodes: Node[];
@@ -22,6 +22,35 @@ export interface Frame {
   applied: RunEvent[];
   /** the provider in force this step — drives the local/remote layout key. */
   provider: string;
+  /** a short "what is happening right now" line for the status bar over the map. */
+  now: Loc;
+}
+
+// Derive the live status line from the folded scene (what the packet is doing).
+function nowLabel(scene: Scene): { en: string; de: string } {
+  if (scene.gate === "pending") return { en: "the permission gate is deciding", de: "das permission-gate entscheidet" };
+  const file = scene.activeFile ? ` ${scene.activeFile}` : "";
+  switch (scene.focus) {
+    case "llm":
+      return { en: "the model is thinking", de: "das modell denkt" };
+    case "disk":
+      return scene.disk === "write"
+        ? { en: `writing${file} to disk`, de: `schreibt${file} auf die disk` }
+        : { en: `reading${file} from disk`, de: `liest${file} von der disk` };
+    case "cmd":
+      return { en: `running: ${scene.activeCommand ?? "a command"}`, de: `führt aus: ${scene.activeCommand ?? "einen befehl"}` };
+    case "mcp":
+      return { en: `calling mcp${scene.activeMcp ? `: ${scene.activeMcp}` : ""}`, de: `mcp-aufruf${scene.activeMcp ? `: ${scene.activeMcp}` : ""}` };
+    case "gate":
+      return { en: "at the permission gate", de: "am permission-gate" };
+    case "user":
+      return { en: "done · control is with you", de: "fertig · die kontrolle ist bei dir" };
+    case "agent":
+    default:
+      return scene.subagents.length
+        ? { en: `orchestrating ${scene.subagents.length} workers`, de: `orchestriert ${scene.subagents.length} worker` }
+        : { en: "the harness is working", de: "der harness arbeitet" };
+  }
 }
 
 const railEdge = (e: RevealEdge, active: boolean): Edge => ({
@@ -81,7 +110,7 @@ export function revealFrame(lesson: RevealLesson, step: EduStep): Frame {
     })
     .filter((e): e is Edge => e !== null);
 
-  return { nodes, edges, applied: [], provider: "ollama" };
+  return { nodes, edges, applied: [], provider: "ollama", now: step.now ?? { en: "building the agent", de: "den agenten bauen" } };
 }
 
 const foldScene = (events: RunEvent[]) => events.reduce(advanceScene, initialScene());
@@ -139,7 +168,7 @@ export function scenarioFrames(lesson: ScenarioLesson, lang: Lang): Frame[] {
         }
       }
     }
-    return { nodes: flow.nodes, edges: flow.edges, applied, provider };
+    return { nodes: flow.nodes, edges: flow.edges, applied, provider, now: nowLabel(scene) };
   });
 }
 

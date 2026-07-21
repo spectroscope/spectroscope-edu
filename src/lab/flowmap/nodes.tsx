@@ -52,8 +52,27 @@ function Disclosure({ label, children, open: openDefault = false }: { label: str
 
 interface Activity { text: string; color: string; }
 
-/** The tool chips the agent hub shows (the standard tool belt). */
-const AGENT_TOOL_CHIPS = ["read_file", "write_file", "list_dir", "run_command"];
+/** The tool chips the agent hub shows (the tool belt + the extension actions). */
+const AGENT_TOOL_CHIPS = ["read_file", "write_file", "list_dir", "run_command", "use_skill", "call_mcp", "generate_image"];
+
+/** A tiny "generated image" thumbnail (a placeholder, not a real asset) shown
+ *  when the agent's active tool is generate_image. */
+function GenImage() {
+  return (
+    <svg className="pf-genimg" width="72" height="48" viewBox="0 0 72 48" aria-hidden="true">
+      <defs>
+        <linearGradient id="pf-gi" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="var(--sp-ocean)" />
+          <stop offset="0.5" stopColor="var(--sp-violet)" />
+          <stop offset="1" stopColor="var(--sp-amber)" />
+        </linearGradient>
+      </defs>
+      <rect x="1" y="1" width="70" height="46" rx="4" fill="url(#pf-gi)" opacity="0.85" />
+      <circle cx="20" cy="18" r="6" fill="var(--surface)" opacity="0.7" />
+      <path d="M6 42 L26 24 L38 34 L52 18 L66 42 Z" fill="var(--surface)" opacity="0.5" />
+    </svg>
+  );
+}
 
 /** The shell's one-line display clips a running command to this width. */
 const SHELL_PREVIEW_CHARS = 26;
@@ -64,6 +83,26 @@ const SHELL_PREVIEW_CHARS = 26;
 export function UserNode({ data }: NodeProps) {
   const d = data as { active: boolean; prompt: string };
   const lang = useLang();
+  const expandAll = useContext(ExpandAllContext);
+
+  // edu: the prompt sits BESIDE the user, in a column (like the agent card).
+  if (expandAll && d.prompt) {
+    return (
+      <div className={`pf-card pf-user pf-user--wide${d.active ? " pf-card--active" : ""}`}>
+        <div className="pf-user__col">
+          <Keyboard active={d.active} />
+          <div className="pf-user__name">User</div>
+          <div className="pf-user__sub">{d.active ? t(lang, "map.user.typing") : "PROMPT"}</div>
+        </div>
+        <div className="pf-user__prompt">
+          <div className="pf-eyebrow">prompt</div>
+          <div className="pf-prose nowheel" style={{ textAlign: "left" }}>{d.prompt}</div>
+        </div>
+        <Handles />
+      </div>
+    );
+  }
+
   return (
     <div className={`pf-card pf-user${d.active ? " pf-card--active" : ""}`}>
       <Keyboard active={d.active} />
@@ -156,9 +195,16 @@ export function AgentNode({ data }: NodeProps) {
       {d.tool ? (
         <div className="pf-panelbox">
           <div className="pf-panelbox__label">{t(lang, "map.ctx.toolCall")} · {d.tool.name}</div>
-          <div className="nowheel" style={{ maxHeight: 150, overflow: "auto" }}>
-            <JsonTree value={d.tool.input} defaultDepth={3} />
-          </div>
+          {d.tool.name === "generate_image" ? (
+            <div className="pf-genimg-wrap">
+              <GenImage />
+              <span className="pf-genimg-cap">{String((d.tool.input as { prompt?: string })?.prompt ?? "a generated image")}</span>
+            </div>
+          ) : (
+            <div className="nowheel" style={{ maxHeight: 150, overflow: "auto" }}>
+              <JsonTree value={d.tool.input} defaultDepth={3} />
+            </div>
+          )}
         </div>
       ) : (
         <div className="pf-kv">{t(lang, "map.ctx.noTool")}</div>
