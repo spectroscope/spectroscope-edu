@@ -23,8 +23,19 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
+  width: 100%;
   padding: var(--sp-4);
+  border: 0;
   border-bottom: 1px solid var(--border);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.edu-brand:hover {
+  background: var(--surface-2);
 }
 .edu-brand-mark {
   width: 22px;
@@ -139,6 +150,8 @@
   padding: var(--sp-3) var(--sp-4);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--sp-3);
 }
 .edu-toggle {
@@ -164,10 +177,6 @@
   background: var(--accent-soft);
   color: var(--text);
 }
-.edu-foot-spacer {
-  flex: 1;
-}
-
 /* ---- stage ---- */
 .edu-stage {
   flex: 1 1 auto;
@@ -288,4 +297,112 @@
   margin: 0;
   color: var(--text-dim);
   line-height: var(--lh-body);
+}
+
+/* ============================================================
+   home landing (dev-portal style) — the app opens here
+   ============================================================ */
+
+.edu-home {
+  height: 100%;
+  overflow-y: auto;
+  background:
+    radial-gradient(1100px 480px at 50% -160px, var(--glint), transparent 70%)
+    var(--bg);
+}
+
+.edu-home-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) clamp(var(--sp-4), 5vw, var(--sp-7));
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(10px);
+}
+.edu-home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.edu-home-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.edu-home-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 clamp(var(--sp-4), 5vw, var(--sp-7));
+}
+
+.edu-home-hero {
+  max-width: 680px;
+  padding: clamp(var(--sp-6), 9vh, calc(var(--sp-7) * 1.6)) 0 var(--sp-6);
+}
+.edu-home-hero h1 {
+  margin: var(--sp-3) 0 var(--sp-4);
+  font-size: clamp(var(--fs-28), 5vw, 42px);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+.edu-home-lede {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: var(--fs-16);
+  line-height: var(--lh-body);
+}
+.edu-home-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+.edu-home-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-6);
+}
+.edu-home-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--sp-4) var(--sp-4) var(--sp-5);
+  background: var(--surface);
+}
+.edu-home-card h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-16);
+  font-weight: 600;
+}
+.edu-home-card h2 i {
+  display: inline-block;
+  width: 3px;
+  height: 0.9em;
+  border-radius: 1px;
+  flex: none;
+}
+.edu-home-card p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: var(--fs-13);
+  line-height: var(--lh-body);
+}
+
+.edu-home-foot {
+  padding: var(--sp-5) 0 var(--sp-7);
+  border-top: 1px solid var(--border);
+  color: var(--text-faint);
+  font-size: var(--fs-12);
 }

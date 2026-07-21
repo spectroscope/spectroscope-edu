@@ -1,35 +1,41 @@
-// The app shell. A left sidebar carries a two-way segment switch (edu |
-// simulator) — the exact idiom of spectro-web's sessions|fleets nav, but a
-// FRESH component (this app owns its own Sidebar; it never imports spectro-web's,
-// which the product's Fleet Manager work is rewriting). The stage renders the
-// simulator (default) or the edu placeholder. There is no backend and no router:
-// view state is local, and the simulator rides the stepper replay seam.
+// The app shell. At the root the app opens on a small dev-portal-style HOME
+// landing (explanation + features + two entry points); from there you enter the
+// simulator or edu, which render inside the sidebar shell. The brand mark in the
+// sidebar returns to home. There is no backend and no router — view state is
+// local, and the simulator rides the stepper replay seam.
 
 import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { SimView } from "./SimView";
 import { EduView } from "./EduView";
+import { EduHome } from "./EduHome";
 import { SCENARIOS } from "./scenario/registry";
 
 export type Nav = "edu" | "simulator";
+export type View = "home" | Nav;
 
 export function App() {
-  const [nav, setNav] = useState<Nav>("simulator");
+  const [view, setView] = useState<View>("home");
   const [scenarioId, setScenarioId] = useState<string>(SCENARIOS[0].id);
+
+  if (view === "home") {
+    return <EduHome onEnter={setView} />;
+  }
 
   return (
     <div className="edu-app">
       <Sidebar
-        nav={nav}
-        onNav={setNav}
+        nav={view}
+        onNav={setView}
+        onHome={() => setView("home")}
         scenarioId={scenarioId}
         onSelectScenario={(id) => {
           setScenarioId(id);
-          setNav("simulator");
+          setView("simulator");
         }}
       />
       <main className="edu-stage">
-        {nav === "simulator" ? <SimView scenarioId={scenarioId} /> : <EduView />}
+        {view === "simulator" ? <SimView scenarioId={scenarioId} /> : <EduView />}
       </main>
     </div>
   );
