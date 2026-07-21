@@ -53,9 +53,11 @@ export function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // First-ever open of the app (any view — it is one app): show the keymap once so
-  // the shortcuts are discovered, then remember it so it never auto-opens again.
+  // The first time the user actually enters a VIEW (simulator or edu, not the home
+  // landing where an overlay would feel out of place), show the keymap once so the
+  // shortcuts are discovered, then remember it so it never auto-opens again.
   useEffect(() => {
+    if (view === "home") return;
     try {
       if (!localStorage.getItem("spectroscope:keymapSeen")) {
         setKeymapOpen(true);
@@ -64,7 +66,7 @@ export function App() {
     } catch {
       /* localStorage unavailable (private mode) — just skip the one-time intro */
     }
-  }, []);
+  }, [view]);
 
   return (
     <>
