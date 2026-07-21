@@ -519,6 +519,90 @@
   line-height: var(--lh-body);
 }
 
+/* the game-style keymap card on the landing (a teaser that opens the ? overlay) */
+.edu-home-keymap {
+  padding-bottom: var(--sp-5);
+}
+.km-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  padding: var(--sp-4);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.km-card:hover,
+.km-card:focus-visible {
+  border-color: var(--accent);
+  background: var(--surface-2);
+  outline: none;
+}
+.km-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.km-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-16);
+  font-weight: 600;
+}
+.km-card-ico {
+  display: inline-flex;
+  color: var(--accent);
+}
+.km-card-ico svg {
+  width: 20px;
+  height: 20px;
+}
+.km-card-hint {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--text-faint);
+}
+.km-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--sp-3);
+}
+.km-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--bg);
+}
+.km-chip-ico {
+  display: inline-flex;
+  color: var(--text-faint);
+  flex: none;
+}
+.km-chip-ico svg {
+  width: 18px;
+  height: 18px;
+}
+.km-chip-keys {
+  display: inline-flex;
+  gap: 4px;
+  flex: none;
+}
+.km-chip-label {
+  font-size: var(--fs-12);
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .edu-home-foot {
   padding: var(--sp-5) 0 var(--sp-7);
   border-top: 1px solid var(--border);

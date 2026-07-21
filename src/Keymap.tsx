@@ -8,7 +8,7 @@ import type { JSX } from "react";
 import { useLang } from "./state/lang";
 
 type Loc = { en: string; de: string };
-type IconName = "step" | "back" | "play" | "reset" | "home" | "jsonl" | "trace" | "flip" | "keys" | "close";
+export type IconName = "step" | "back" | "play" | "reset" | "home" | "jsonl" | "trace" | "flip" | "keys" | "close";
 interface Row {
   keys: string[];
   icon: IconName;
@@ -20,7 +20,7 @@ interface Group {
 }
 
 const S = { width: 22, height: 22, viewBox: "0 0 22 22", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-const ICON: Record<IconName, JSX.Element> = {
+export const ICON: Record<IconName, JSX.Element> = {
   step: (<svg {...S}><line x1="4" y1="5" x2="4" y2="17" /><path d="M9 6l6 5-6 5z" /></svg>),
   back: (<svg {...S}><line x1="18" y1="5" x2="18" y2="17" /><path d="M13 6l-6 5 6 5z" /></svg>),
   play: (<svg {...S}><path d="M6 4l12 7-12 7z" /></svg>),

@@ -7,10 +7,25 @@ import { useLang } from "./state/lang";
 import { useDesignPrefs } from "./state/designPrefs";
 import { ThemeLangControls } from "./ThemeLangControls";
 import { SimGuide } from "./SimGuide";
+import { ICON, type IconName } from "./Keymap";
 import type { Nav } from "./App";
 
 type Loc = { en: string; de: string };
 const t = (v: Loc, lang: "en" | "de") => v[lang];
+
+// A game-style teaser of the keymap, right on the landing: each chip pairs a
+// physical keycap with the same infographic icon the full ? overlay uses. The
+// whole card opens the overlay — the shortcuts are discoverable, not buried.
+const KEYMAP_TEASER: { keys: string[]; icon: IconName; label: Loc }[] = [
+  { keys: ["→"], icon: "step", label: { en: "step", de: "schritt" } },
+  { keys: ["←"], icon: "back", label: { en: "back", de: "zurück" } },
+  { keys: ["space"], icon: "play", label: { en: "play", de: "abspielen" } },
+  { keys: ["j"], icon: "jsonl", label: { en: "jsonl", de: "jsonl" } },
+  { keys: ["t"], icon: "trace", label: { en: "trace", de: "trace" } },
+  { keys: ["m"], icon: "flip", label: { en: "local / remote", de: "lokal / remote" } },
+  { keys: ["h"], icon: "home", label: { en: "home", de: "start" } },
+  { keys: ["?"], icon: "keys", label: { en: "all keys", de: "alle tasten" } },
+];
 
 interface Feature {
   tick: string; // a spectral event color var — color only on the marks
@@ -113,6 +128,36 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
         </header>
 
         <SimGuide onEnter={props.onEnter} />
+
+        <section className="edu-home-keymap" aria-label={t({ en: "keyboard shortcuts", de: "tastenbelegung" }, lang)}>
+          <button
+            type="button"
+            className="km-card"
+            onClick={props.onOpenKeymap}
+            title={t({ en: "open the full keymap (?)", de: "volle keymap öffnen (?)" }, lang)}
+          >
+            <span className="km-card-head">
+              <span className="km-card-title">
+                <span className="km-card-ico">{ICON.keys}</span>
+                {t({ en: "keyboard shortcuts", de: "tastenbelegung" }, lang)}
+              </span>
+              <span className="km-card-hint">{t({ en: "press ? anytime", de: "drück ? jederzeit" }, lang)}</span>
+            </span>
+            <span className="km-card-grid">
+              {KEYMAP_TEASER.map((r) => (
+                <span key={r.label.en} className="km-chip">
+                  <span className="km-chip-ico">{ICON[r.icon]}</span>
+                  <span className="km-chip-keys">
+                    {r.keys.map((k, i) => (
+                      <kbd key={i} className="km-key">{k}</kbd>
+                    ))}
+                  </span>
+                  <span className="km-chip-label">{t(r.label, lang)}</span>
+                </span>
+              ))}
+            </span>
+          </button>
+        </section>
 
         <section className="edu-home-features" aria-label={t({ en: "features", de: "features" }, lang)}>
           {FEATURES.map((f) => (
