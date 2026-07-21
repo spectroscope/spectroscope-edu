@@ -128,7 +128,7 @@ export function EduView({ lessonId }: { lessonId: string }) {
             <span className="edu-now-dot" />
             <span className="edu-now-label">{ll(frame?.now, de)}</span>
           </div>
-          <EduFlow nodes={frame?.nodes ?? []} edges={frame?.edges ?? []} fitSignal={step} layoutKey={layoutKey} />
+          <EduFlow nodes={frame?.nodes ?? []} edges={frame?.edges ?? []} bbox={frame?.bbox} layoutKey={layoutKey} />
         </div>
         {lesson.readoutKind !== "none" && (
           <aside className="edu-readout">

@@ -15,6 +15,13 @@ import { advanceScene, initialScene, isLocalProvider, type Scene } from "../lab/
 import { deriveDetail, sceneToFlow } from "../lab/flowmap/sceneToFlow";
 import type { EduLesson, EduStep, Loc, RevealEdge, RevealLesson, RevealNode, ScenarioLesson } from "./model";
 
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface Frame {
   nodes: Node[];
   edges: Edge[];
@@ -24,6 +31,50 @@ export interface Frame {
   provider: string;
   /** a short "what is happening right now" line for the status bar over the map. */
   now: Loc;
+  /** the lesson's STABLE camera rect — the union of every card across every step,
+   *  so EduFlow can fit the frame once and never reframe as steps reveal cards.
+   *  Identical on every frame of a lesson. */
+  bbox: Rect;
+}
+
+// Card footprints (unscaled px) so the stable rect can be computed with no DOM —
+// generous, since the rect only feeds fitBounds (padding absorbs the slack). A
+// node with an explicit style width uses the larger of the two.
+const FOOTPRINT: Record<string, { w: number; h: number }> = {
+  user: { w: 480, h: 210 },
+  agent: { w: 560, h: 500 },
+  llm: { w: 460, h: 340 },
+  os: { w: 210, h: 170 },
+  subagent: { w: 330, h: 190 },
+  ext: { w: 200, h: 130 },
+  eduCard: { w: 320, h: 240 },
+};
+
+/** Bounding rect of a set of flow nodes, using each node's footprint (zones carry
+ *  their real width/height in style). Pure — the whole point is a DOM-free camera. */
+export function frameExtent(nodes: Node[]): Rect {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const n of nodes) {
+    const x = n.position.x;
+    const y = n.position.y;
+    const styleW = (n.style as { width?: number } | undefined)?.width;
+    const styleH = (n.style as { height?: number } | undefined)?.height;
+    let w: number, h: number;
+    if (n.type === "zone") {
+      w = typeof styleW === "number" ? styleW : 200;
+      h = typeof styleH === "number" ? styleH : 120;
+    } else {
+      const f = FOOTPRINT[n.type ?? ""] ?? { w: 320, h: 200 };
+      w = typeof styleW === "number" ? Math.max(styleW, f.w) : f.w;
+      h = f.h;
+    }
+    if (x < minX) minX = x;
+    if (y < minY) minY = y;
+    if (x + w > maxX) maxX = x + w;
+    if (y + h > maxY) maxY = y + h;
+  }
+  if (!Number.isFinite(minX)) return { x: 0, y: 0, width: 200, height: 120 };
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 }
 
 // Derive the live status line from the folded scene (what the packet is doing).
@@ -110,7 +161,14 @@ export function revealFrame(lesson: RevealLesson, step: EduStep): Frame {
     })
     .filter((e): e is Edge => e !== null);
 
-  return { nodes, edges, applied: [], provider: "ollama", now: step.now ?? { en: "building the agent", de: "den agenten bauen" } };
+  return {
+    nodes,
+    edges,
+    applied: [],
+    provider: "ollama",
+    now: step.now ?? { en: "building the agent", de: "den agenten bauen" },
+    bbox: frameExtent(nodes),
+  };
 }
 
 const foldScene = (events: RunEvent[]) => events.reduce(advanceScene, initialScene());
@@ -145,9 +203,14 @@ export function scenarioCursors(steps: EduStep[], events: RunEvent[]): number[] 
 export function scenarioFrames(lesson: ScenarioLesson, lang: Lang): Frame[] {
   const events = compile(lesson.dsl, lang);
   const cursors = scenarioCursors(lesson.steps, events);
-  return lesson.steps.map((step, i) => {
-    const applied = events.slice(0, cursors[i]);
-    const scene = foldScene(applied);
+  const applieds = cursors.map((c) => events.slice(0, c));
+  const scenes = applieds.map(foldScene);
+  // The lesson's max subagent count reserves a fixed slot per worker across steps.
+  const subSlots = scenes.reduce((m, s) => Math.max(m, s.subagents.length), 0);
+
+  const frames: Frame[] = lesson.steps.map((step, i) => {
+    const applied = applieds[i];
+    const scene = scenes[i];
     const detail = deriveDetail(applied);
     const provider = step.provider ?? lesson.dsl.provider ?? "ollama";
     const local = isLocalProvider(provider);
@@ -157,6 +220,8 @@ export function scenarioFrames(lesson: ScenarioLesson, lang: Lang): Frame[] {
       model: lesson.model ?? "",
       systemPrompt: lesson.systemPrompt,
       lang,
+      declutter: true,
+      subSlots,
     });
     // Optional teaching override: force specific rails to light this step.
     if (step.activeEdges && step.activeEdges.length) {
@@ -168,13 +233,21 @@ export function scenarioFrames(lesson: ScenarioLesson, lang: Lang): Frame[] {
         }
       }
     }
-    return { nodes: flow.nodes, edges: flow.edges, applied, provider, now: nowLabel(scene) };
+    return { nodes: flow.nodes, edges: flow.edges, applied, provider, now: nowLabel(scene), bbox: { x: 0, y: 0, width: 0, height: 0 } };
   });
+
+  // One STABLE rect for the whole lesson: the union of every card across every
+  // step (subagent slots are already fixed), so the camera fits once and holds.
+  const bbox = frameExtent(frames.flatMap((f) => f.nodes));
+  for (const f of frames) f.bbox = bbox;
+  return frames;
 }
 
 /** Every frame of a lesson, in step order. */
 export function lessonFrames(lesson: EduLesson, lang: Lang): Frame[] {
-  return lesson.mode === "scenario"
-    ? scenarioFrames(lesson, lang)
-    : lesson.steps.map((s) => revealFrame(lesson, s));
+  if (lesson.mode === "scenario") return scenarioFrames(lesson, lang);
+  // reveal: the stable rect spans the FULL authored catalog (every node the lesson
+  // can ever show), so the camera never reframes as later steps reveal more cards.
+  const bbox = frameExtent(Object.values(lesson.nodes).map((spec) => revealNode(spec, false)));
+  return lesson.steps.map((s) => ({ ...revealFrame(lesson, s), bbox }));
 }

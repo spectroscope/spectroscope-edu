@@ -118,6 +118,109 @@ describe("scenario lesson cursors are well-formed (no dead/collapsed steps)", ()
   }
 });
 
+// Declutter: a scenario lesson never crosses the network boundary, so the "your
+// mac" + "outside" frames and the external services are dropped — only the OS band
+// stays. This is what makes the map tight enough to zoom the cards in bigger.
+describe("scenario frames are decluttered (no your-mac / outside / boundary)", () => {
+  const scenarioLessons = LESSONS.filter((l): l is ScenarioLesson => l.mode === "scenario");
+  const GONE = ["z-mac", "z-outside", "z-boundary", "netz", "mcpserver"];
+  for (const lesson of scenarioLessons) {
+    it(`${lesson.id} drops the frames + external services, keeps the OS band`, () => {
+      const frames = lessonFrames(lesson, "en");
+      for (const f of frames) {
+        const ids = new Set(f.nodes.map((n) => n.id));
+        for (const gone of GONE) expect(ids.has(gone), `${lesson.id} still has ${gone}`).toBe(false);
+        expect(ids.has("z-os"), `${lesson.id} lost the OS band`).toBe(true);
+        // no dangling rail to a removed external service
+        const targets = new Set(f.nodes.map((n) => n.id));
+        for (const e of f.edges) {
+          expect(targets.has(e.source), `edge ${e.id} source missing`).toBe(true);
+          expect(targets.has(e.target), `edge ${e.id} target missing`).toBe(true);
+        }
+      }
+    });
+  }
+});
+
+// Stable subagent slots: a worker keeps the same position across steps as its
+// siblings spawn (reserved slots), so the fan-out reveals in place, not by shoving
+// the earlier workers down. This is the "already there" the owner asked for.
+describe("subagent positions are stable across a lesson's steps", () => {
+  const withSubs = LESSONS.filter(
+    (l): l is ScenarioLesson => l.mode === "scenario" && l.dsl != null,
+  );
+  for (const lesson of withSubs) {
+    it(`${lesson.id}: every subagent node has one fixed position`, () => {
+      const frames = lessonFrames(lesson, "en");
+      const seen = new Map<string, { x: number; y: number }>();
+      let anySub = false;
+      for (const f of frames) {
+        for (const n of f.nodes) {
+          if (!n.id.startsWith("sub-")) continue;
+          anySub = true;
+          const prev = seen.get(n.id);
+          if (prev) {
+            expect(n.position.x, `${n.id} x moved`).toBe(prev.x);
+            expect(n.position.y, `${n.id} y moved`).toBe(prev.y);
+          } else {
+            seen.set(n.id, { x: n.position.x, y: n.position.y });
+          }
+        }
+      }
+      // fleet + context-window have workers; the rest simply have none (fine).
+      if (lesson.id === "fleet") expect(anySub, "fleet grew no workers").toBe(true);
+    });
+  }
+});
+
+// The edu layout re-seats the expanded cards so they do NOT overlap by
+// construction: the wide agent goes to the far left (clear of the worker column)
+// and the user drops below it (clear of the tall agent). Pins the override so a
+// refactor cannot silently reintroduce the first-render collision nudge.
+describe("scenario frames seat the expanded agent + user without overlap", () => {
+  const scenarioLessons = LESSONS.filter((l): l is ScenarioLesson => l.mode === "scenario");
+  for (const lesson of scenarioLessons) {
+    it(`${lesson.id}: agent far-left, user below it`, () => {
+      const frames = lessonFrames(lesson, "en");
+      for (const f of frames) {
+        const agent = f.nodes.find((n) => n.id === "agent");
+        const user = f.nodes.find((n) => n.id === "user");
+        expect(agent, "no agent node").toBeTruthy();
+        expect(agent!.position.x, "agent not seated at the far left").toBe(40);
+        if (user) {
+          expect(user.position.x).toBe(40);
+          // the user sits below the agent's top, in its own vertical band
+          expect(user.position.y).toBeGreaterThan(agent!.position.y);
+        }
+      }
+    });
+  }
+});
+
+// The stable camera rect: one rect per lesson, identical on every frame, finite and
+// positive, and — for scenario lessons — tight enough that it excludes the old
+// far-right "outside" extent (which used to start at x≈1372).
+describe("Frame.bbox is a single stable rect per lesson", () => {
+  for (const lesson of LESSONS) {
+    it(`${lesson.id}: same finite rect on every frame`, () => {
+      const frames = lessonFrames(lesson, "en");
+      const b0 = frames[0].bbox;
+      expect(b0.width).toBeGreaterThan(0);
+      expect(b0.height).toBeGreaterThan(0);
+      expect(Number.isFinite(b0.x) && Number.isFinite(b0.y)).toBe(true);
+      for (const f of frames) {
+        expect(f.bbox.x).toBe(b0.x);
+        expect(f.bbox.y).toBe(b0.y);
+        expect(f.bbox.width).toBe(b0.width);
+        expect(f.bbox.height).toBe(b0.height);
+      }
+      if (lesson.mode === "scenario") {
+        expect(b0.x + b0.width, `${lesson.id} rect still spans the old outside`).toBeLessThan(1372);
+      }
+    });
+  }
+});
+
 // Every lesson builds one non-empty frame per step (both modes, both languages).
 describe("every catalog lesson renders a frame per step", () => {
   for (const lesson of LESSONS) {

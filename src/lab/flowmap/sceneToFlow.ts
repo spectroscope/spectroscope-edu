@@ -189,10 +189,24 @@ export interface FlowResult { nodes: Node[]; edges: Edge[]; }
 export function sceneToFlow(
   scene: Scene,
   detail: Detail,
-  opts: { local: boolean; provider: string; model: string; systemPrompt?: string; lang?: Lang },
+  opts: {
+    local: boolean;
+    provider: string;
+    model: string;
+    systemPrompt?: string;
+    lang?: Lang;
+    /** edu: drop the "your mac" + "outside" frames + boundary + external services
+     *  (a scenario lesson never crosses the boundary), keeping only the OS band —
+     *  the map is tighter, so the camera zooms the actual cards in bigger. */
+    declutter?: boolean;
+    /** edu: reserve this many subagent slots (the lesson's max), so a worker never
+     *  slides down as its siblings spawn — its slot is fixed from the first frame. */
+    subSlots?: number;
+  },
 ): FlowResult {
   const L = opts.local ? LAYOUTS.local : LAYOUTS.remote;
   const lang: Lang = opts.lang ?? "en";
+  const declutter = opts.declutter ?? false;
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
@@ -201,9 +215,8 @@ export function sceneToFlow(
     mac: t(lang, "map.zone.mac"), os: t(lang, "map.zone.os"), outside: t(lang, "map.zone.outside"),
   };
   for (const z of L.zones) {
-    if (z.variant === "outside" && opts.local) {
-      // keep it, but it only holds Netz + MCP-Server when local
-    }
+    // edu declutter: keep only the OS band; the "your mac" + "outside" frames go.
+    if (declutter && z.variant !== "os") continue;
     nodes.push({
       id: z.id,
       type: "zone",
@@ -215,7 +228,7 @@ export function sceneToFlow(
       style: { width: z.w, height: z.h },
     });
   }
-  if (L.boundary) {
+  if (L.boundary && !declutter) {
     nodes.push({
       id: "z-boundary",
       type: "zone",
@@ -228,8 +241,18 @@ export function sceneToFlow(
     });
   }
 
+  // edu: every card is EXPANDED (wide + tall), so the sim's tight diagonal layout
+  // is re-seated to fit them WITHOUT a first-render collision nudge:
+  //  - the agent goes to the far left, so its right edge clears the worker column
+  //    (workers no longer shove it down as they spawn);
+  //  - the user drops below the agent's typical expanded height, so the tall agent
+  //    and the user no longer overlap (they share the left column). y=520 is where
+  //    the resolver used to settle it — authoring it there means "already placed".
+  // A local override, never a mutation of the shared (sim-facing) layout.
+  const EDU_POS: Record<string, XY> = { agent: { x: 40, y: 150 }, user: { x: 40, y: 520 } };
+  const posOf = (id: string): XY => (declutter && EDU_POS[id]) || L.pos[id];
   const N = (id: string, type: string, data: Record<string, unknown>, z = 10) =>
-    nodes.push({ id, type, position: L.pos[id], data, zIndex: z });
+    nodes.push({ id, type, position: posOf(id), data, zIndex: z });
 
   // ----- user -----
   N("user", "user", { active: scene.focus === "user", prompt: detail.prompt });
@@ -288,13 +311,18 @@ export function sceneToFlow(
     answer: streamsOf(detail.answer),
   });
 
-  // ----- external services -----
-  N("netz", "ext", { kind: "netz", active: mcpInUse });
-  N("mcpserver", "ext", { kind: "mcpserver", active: mcpInUse, mcp: mcpUser?.loop.activeMcp ?? null });
+  // ----- external services ----- (edu declutter drops the whole "outside")
+  if (!declutter) {
+    N("netz", "ext", { kind: "netz", active: mcpInUse });
+    N("mcpserver", "ext", { kind: "mcpserver", active: mcpInUse, mcp: mcpUser?.loop.activeMcp ?? null });
+  }
 
   // ----- subagents (each its own loop) -----
   const subs = scene.subagents.slice(0, SUB_MAX);
-  const subYs = subagentYs(subs.length, L.subBase.y, SUB_BAND_BOTTOM, L.subGap);
+  // reserve a fixed slot per subagent (edu passes the lesson's max) so a worker
+  // never slides as siblings spawn; falls back to the live count for the sim.
+  const slotCount = Math.min(SUB_MAX, Math.max(subs.length, opts.subSlots ?? subs.length));
+  const subYs = subagentYs(slotCount, L.subBase.y, SUB_BAND_BOTTOM, L.subGap);
   subs.forEach((c, i) => {
     const id = `sub-${c.id}`;
     L.pos[id] = { x: L.subBase.x, y: subYs[i] };
@@ -341,8 +369,11 @@ export function sceneToFlow(
   const mainOnMcp = scene.activeMcp !== null;
   E("e-agent-osmcp", "agent", "os-mcp", "bs", "tt", mainLit === "os-mcp" || mainOnMcp, { err: mcpErr && mcpUser?.id === "main" });
   E("e-osmcp-osnet", "os-mcp", "os-net", "rs", "lt", mcpInUse, { err: mcpErr });
-  E("e-osnet-netz", "os-net", "netz", "rs", "lt", mcpInUse, { net: true, err: mcpErr });
-  E("e-netz-mcpserver", "netz", "mcpserver", "rs", "lt", mcpInUse, { net: true, err: mcpErr });
+  if (!declutter) {
+    // the legs out to Netz + MCP-Server only exist when the "outside" is drawn.
+    E("e-osnet-netz", "os-net", "netz", "rs", "lt", mcpInUse, { net: true, err: mcpErr });
+    E("e-netz-mcpserver", "netz", "mcpserver", "rs", "lt", mcpInUse, { net: true, err: mcpErr });
+  }
 
   subs.forEach((c) => {
     const id = `sub-${c.id}`;
