@@ -8,7 +8,23 @@ type ToolCall = Extract<RunEvent, { type: "tool_call" }>;
 
 describe("registry", () => {
   it("has the built-in scenarios", () => {
-    expect(SCENARIOS.map((s) => s.id).sort()).toEqual(["buildplan", "coding", "context", "diskshell", "fanout", "permission", "research"]);
+    expect(SCENARIOS.map((s) => s.id).sort()).toEqual([
+      "buildplan", "codereview", "coding", "context", "darkmode", "diskshell", "fanout", "permission", "research",
+    ]);
+  });
+
+  it("codereview scenario: writes the file, then fans out three lens reviewers", () => {
+    const ev = compile(SCENARIOS.find((s) => s.id === "codereview")!, "en");
+    expect(ev.some((e) => e.type === "tool_call" && e.name === "write_file" && e.agentId === "main")).toBe(true);
+    expect(ev.filter((e) => e.type === "agent_spawn").length).toBe(3);
+    // each reviewer reads the target file from inside its own loop
+    const childReads = ev.filter((e): e is ToolCall => e.type === "tool_call" && e.name === "read_file" && e.agentId !== "main");
+    expect(new Set(childReads.map((e) => e.agentId)).size).toBe(3);
+  });
+
+  it("darkmode scenario: one build_plan worker drafts the plan", () => {
+    const ev = compile(SCENARIOS.find((s) => s.id === "darkmode")!, "en");
+    expect(ev.filter((e) => e.type === "agent_spawn").length).toBe(1);
   });
 
   it("context scenario: the window fills to 'high', then a compaction shrinks it", () => {

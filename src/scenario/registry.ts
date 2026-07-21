@@ -234,4 +234,102 @@ const context: Dsl = {
   ],
 };
 
-export const SCENARIOS: Dsl[] = [buildplan, fanout, permission, diskshell, coding, research, context];
+// Three lenses in parallel over one small file the agent writes first. The file
+// hides three planted flaws — one per lens — so each reviewer lands its own
+// finding and the merge names the worst (the eval).
+const codereview: Dsl = {
+  id: "codereview",
+  name: { en: "code review · 3 lenses", de: "Code-Review · 3 Linsen" },
+  prompt: {
+    en: "Review parse_ages() in review_target.py through three lenses in parallel — correctness, security, readability — then give me a verdict table and the single worst issue.",
+    de: "Prüfe parse_ages() in review_target.py durch drei Linsen parallel — Korrektheit, Sicherheit, Lesbarkeit — dann gib mir eine Urteils-Tabelle und das eine schlimmste Problem.",
+  },
+  provider: "ollama",
+  steps: [
+    { think: { en: "First I write the file under review, then I fan out one reviewer per lens.", de: "Zuerst schreibe ich die zu prüfende Datei, dann fächere ich einen Reviewer pro Linse auf." } },
+    {
+      write: "review_target.py",
+      result: {
+        en: 'def parse_ages(csv_line):\n    p = csv_line.split(",")\n    return [eval(a) for a in p[0:len(p) - 1]]',
+        de: 'def parse_ages(csv_line):\n    p = csv_line.split(",")\n    return [eval(a) for a in p[0:len(p) - 1]]',
+      },
+    },
+    {
+      fanout: {
+        label: "review",
+        tool: "review",
+        agents: [
+          {
+            id: "correctness",
+            task: { en: "Review correctness", de: "Prüfe Korrektheit" },
+            steps: [
+              { read: "review_target.py", result: "return [eval(a) for a in p[0:len(p) - 1]]" },
+              { status: { en: "checking the slice bounds", de: "prüfe die Slice-Grenzen" } },
+              { say: { en: "## Correctness\n- Off-by-one: p[0:len(p)-1] silently drops the LAST age.", de: "## Korrektheit\n- Off-by-one: p[0:len(p)-1] verwirft still das LETZTE Alter." } },
+            ],
+          },
+          {
+            id: "security",
+            task: { en: "Review security", de: "Prüfe Sicherheit" },
+            steps: [
+              { read: "review_target.py", result: "return [eval(a) for a in ...]" },
+              { status: { en: "scanning for unsafe calls", de: "suche nach unsicheren Aufrufen" } },
+              { say: { en: "## Security\n- eval() on the CSV input = arbitrary code execution.", de: "## Sicherheit\n- eval() auf den CSV-Input = beliebige Code-Ausführung." } },
+            ],
+          },
+          {
+            id: "readability",
+            task: { en: "Review readability", de: "Prüfe Lesbarkeit" },
+            steps: [
+              { read: "review_target.py", result: 'p = csv_line.split(","); ... a ...' },
+              { status: { en: "reading the names", de: "lese die Namen" } },
+              { say: { en: "## Readability\n- One-letter names p, a hide what the code means.", de: "## Lesbarkeit\n- Ein-Buchstaben-Namen p, a verbergen die Bedeutung." } },
+            ],
+          },
+        ],
+      },
+    },
+    { think: { en: "All three lenses are back. The eval() on user input is the one that can own the box.", de: "Alle drei Linsen sind zurück. Das eval() auf User-Input ist das, was die Maschine übernehmen kann." } },
+    {
+      say: {
+        en: "Verdict\ncorrectness | off-by-one drops the last age | medium\nsecurity | eval() on user input | CRITICAL\nreadability | one-letter names p, a | low\n\nWorst: the eval() lets any CSV line run arbitrary code.",
+        de: "Urteil\nKorrektheit | Off-by-one verwirft das letzte Alter | mittel\nSicherheit | eval() auf User-Input | KRITISCH\nLesbarkeit | Ein-Buchstaben-Namen p, a | niedrig\n\nSchlimmstes: das eval() lässt jede CSV-Zeile beliebigen Code ausführen.",
+      },
+    },
+  ],
+};
+
+// One worker drafts a plan; the main agent reports as it goes, then compresses
+// the worker's five steps to three bullets.
+const darkmode: Dsl = {
+  id: "darkmode",
+  name: { en: "build_plan · dark mode", de: "build_plan · Dark Mode" },
+  prompt: {
+    en: "Draft a concise 5-step plan for adding dark mode to a web app. Use build_plan to have a worker draft it, keep me posted, then summarize in three bullets.",
+    de: "Entwirf einen knappen 5-Schritte-Plan, um einer Web-App Dark Mode hinzuzufügen. Nutze build_plan, damit ein Worker ihn entwirft, halt mich auf dem Laufenden, dann fasse in drei Punkten zusammen.",
+  },
+  provider: "ollama",
+  steps: [
+    { think: { en: "I delegate the planning to a build_plan worker and report the progress.", de: "Ich delegiere die Planung an einen build_plan-Worker und melde den Fortschritt." } },
+    {
+      spawn: "worker-1",
+      label: "build_plan",
+      task: { en: "Draft a concise 5-step dark-mode plan for a web app.", de: "Entwirf einen knappen 5-Schritte-Dark-Mode-Plan für eine Web-App." },
+      steps: [
+        { status: { en: "Loading the writing-plans skill", de: "Lade die writing-plans-Skill" } },
+        { think: { en: "Dark mode is tokens plus a toggle plus persistence. Five steps.", de: "Dark Mode ist Tokens plus Toggle plus Persistenz. Fünf Schritte." } },
+        { status: { en: "Drafting the 5 steps", de: "Entwerfe die 5 Schritte" } },
+        { say: { en: '# Dark mode plan\n1. Move colors into CSS custom properties (tokens).\n2. Add a [data-theme="dark"] override set.\n3. Add a toggle control in the header.\n4. Persist the choice in localStorage; honor prefers-color-scheme.\n5. Audit contrast and images/icons for both themes.', de: '# Dark-Mode-Plan\n1. Farben in CSS-Custom-Properties (Tokens) ziehen.\n2. Ein [data-theme="dark"]-Override-Set ergänzen.\n3. Einen Toggle im Header hinzufügen.\n4. Wahl in localStorage speichern; prefers-color-scheme beachten.\n5. Kontrast und Bilder/Icons für beide Themes prüfen.' } },
+      ],
+    },
+    { think: { en: "The worker's plan is tight. I compress it to three bullets.", de: "Der Plan des Workers ist knapp. Ich verdichte ihn auf drei Punkte." } },
+    {
+      say: {
+        en: "Summary\n- Tokenize the colors, then override them under [data-theme=\"dark\"].\n- Add a header toggle that persists and respects the OS setting.\n- Verify contrast and asset legibility in both themes.",
+        de: "Zusammenfassung\n- Farben tokenisieren, dann unter [data-theme=\"dark\"] überschreiben.\n- Header-Toggle, der speichert und die OS-Einstellung respektiert.\n- Kontrast und Asset-Lesbarkeit in beiden Themes prüfen.",
+      },
+    },
+  ],
+};
+
+export const SCENARIOS: Dsl[] = [buildplan, fanout, codereview, darkmode, permission, diskshell, coding, research, context];
