@@ -6,6 +6,7 @@
 import { useLang } from "./state/lang";
 import { useDesignPrefs } from "./state/designPrefs";
 import { ThemeLangControls } from "./ThemeLangControls";
+import { SimGuide } from "./SimGuide";
 import type { Nav } from "./App";
 
 type Loc = { en: string; de: string };
@@ -101,6 +102,8 @@ export function EduHome(props: { onEnter: (view: Nav) => void }) {
             </button>
           </div>
         </header>
+
+        <SimGuide onEnter={props.onEnter} />
 
         <section className="edu-home-features" aria-label={t({ en: "features", de: "features" }, lang)}>
           {FEATURES.map((f) => (
