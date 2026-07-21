@@ -1,42 +1,78 @@
-// The app shell. At the root the app opens on a small dev-portal-style HOME
-// landing (explanation + features + two entry points); from there you enter the
-// simulator or edu, which render inside the sidebar shell. The brand mark in the
-// sidebar returns to home. There is no backend and no router — view state is
-// local, and the simulator rides the stepper replay seam.
+// The app shell. The view (home | edu | simulator) is driven by the URL hash
+// (state/route.ts), so each has its own address and the browser back button
+// returns to home instead of leaving the app. At the root the app opens on a
+// dev-portal home landing; from there you enter the simulator or edu, which
+// render inside the sidebar shell. A global keymap (?) lists the shortcuts.
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { SimView } from "./SimView";
 import { EduView } from "./EduView";
 import { EduHome } from "./EduHome";
+import { Keymap } from "./Keymap";
+import { navigate, useView } from "./state/route";
 import { SCENARIOS } from "./scenario/registry";
 
-export type Nav = "edu" | "simulator";
-export type View = "home" | Nav;
+export type { Nav, View } from "./state/route";
+
+/** True while the user is typing, so shortcuts do not steal their keystrokes. */
+function isTyping(target: EventTarget | null): boolean {
+  const el = target as HTMLElement | null;
+  if (el === null) return false;
+  const tag = el.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || el.isContentEditable;
+}
 
 export function App() {
-  const [view, setView] = useState<View>("home");
+  const view = useView();
   const [scenarioId, setScenarioId] = useState<string>(SCENARIOS[0].id);
+  const [keymapOpen, setKeymapOpen] = useState(false);
 
-  if (view === "home") {
-    return <EduHome onEnter={setView} />;
-  }
+  // Global shortcuts: ? toggles the keymap, Esc closes it, h goes home.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setKeymapOpen(false);
+        return;
+      }
+      if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "?") {
+        e.preventDefault();
+        setKeymapOpen((o) => !o);
+      } else if (e.key === "h") {
+        navigate("home");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
-    <div className="edu-app">
-      <Sidebar
-        nav={view}
-        onNav={setView}
-        onHome={() => setView("home")}
-        scenarioId={scenarioId}
-        onSelectScenario={(id) => {
-          setScenarioId(id);
-          setView("simulator");
-        }}
-      />
-      <main className="edu-stage">
-        {view === "simulator" ? <SimView scenarioId={scenarioId} /> : <EduView />}
-      </main>
-    </div>
+    <>
+      {view === "home" ? (
+        <EduHome onEnter={navigate} onOpenKeymap={() => setKeymapOpen(true)} />
+      ) : (
+        <div className="edu-app">
+          <Sidebar
+            nav={view}
+            onNav={navigate}
+            onHome={() => navigate("home")}
+            scenarioId={scenarioId}
+            onSelectScenario={(id) => {
+              setScenarioId(id);
+              navigate("simulator");
+            }}
+          />
+          <main className="edu-stage">
+            {view === "simulator" ? (
+              <SimView scenarioId={scenarioId} onOpenKeymap={() => setKeymapOpen(true)} />
+            ) : (
+              <EduView />
+            )}
+          </main>
+        </div>
+      )}
+      <Keymap open={keymapOpen} onClose={() => setKeymapOpen(false)} />
+    </>
   );
 }

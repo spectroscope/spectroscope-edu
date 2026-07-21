@@ -61,7 +61,7 @@ const FEATURES: Feature[] = [
   },
 ];
 
-export function EduHome(props: { onEnter: (view: Nav) => void }) {
+export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () => void }) {
   const lang = useLang();
   const { prefs } = useDesignPrefs();
   const dark = prefs.design === "spectroscope";
@@ -77,6 +77,15 @@ export function EduHome(props: { onEnter: (view: Nav) => void }) {
         </span>
         <div className="edu-home-controls">
           <ThemeLangControls />
+          <button
+            type="button"
+            className="sim-keys"
+            onClick={props.onOpenKeymap}
+            title={lang === "de" ? "Tastaturkürzel (?)" : "keyboard shortcuts (?)"}
+            aria-label={lang === "de" ? "Tastaturkürzel" : "keyboard shortcuts"}
+          >
+            ?
+          </button>
         </div>
       </nav>
 
