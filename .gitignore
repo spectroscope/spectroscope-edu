@@ -4,3 +4,6 @@ dist/
 .DS_Store
 *.local
 coverage/
+
+# local-only design docs (not shipped to the repo)
+docs/
