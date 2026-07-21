@@ -1,0 +1,7 @@
+/* spectroscope-edu — the style entry point. Colors come EXCLUSIVELY from
+   tokens.css variables (lifted from spectro-web). FlowMap self-imports
+   @xyflow/react/dist/style.css + flowmap.css, so they are not listed here. */
+
+@import "./styles/base.css"; /* reset, scrollbars, dots, eyebrows, buttons */
+@import "./styles/lab.css"; /* lab controls, flow-map box, petri/system map */
+@import "./styles/shell.css"; /* edu shell: sidebar switch + stage + fx-switch */
