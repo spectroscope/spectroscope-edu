@@ -8,22 +8,34 @@ import { anatomy } from "./anatomy";
 import { contextInside } from "./context-inside";
 import { loop } from "./loop";
 import { gate } from "./gate";
+import { mcp } from "./mcp";
 import { contextWindow } from "./context-window";
 import { progressiveDisclosure } from "./progressive-disclosure";
+import { skill } from "./skill";
 import { fleet } from "./fleet";
+import { fleetMcp } from "./fleet-mcp";
 import { hookGate } from "./hook-gate";
 import { contractAsFiles } from "./contract-as-files";
+import { compose } from "./compose-extensions";
+import { multiStep } from "./multi-step";
+import { imageGen } from "./image-generation";
 
 export const LESSONS: EduLesson[] = [
   anatomy,
   contextInside,
   loop,
+  multiStep,
   gate,
+  mcp,
   contextWindow,
   progressiveDisclosure,
+  skill,
   fleet,
+  fleetMcp,
   hookGate,
   contractAsFiles,
+  compose,
+  imageGen,
 ];
 
 // Both former stubs are now built lessons; nothing is left "planned".
