@@ -634,10 +634,22 @@
 }
 
 /* ---- the simulator console SVG (clickable preview -> enter the simulator) ---- */
+/* the two home previews (simulator + lessons), side by side */
+.edu-home-guides {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+  margin: 0 0 var(--sp-6);
+}
+@media (max-width: 720px) {
+  .edu-home-guides {
+    grid-template-columns: 1fr;
+  }
+}
 .edu-home-sim {
   display: block;
   width: 100%;
-  margin: 0 0 var(--sp-6);
+  margin: 0;
   padding: 0;
   background: none;
   border: 0;
@@ -729,6 +741,12 @@
   fill: var(--text-dim);
   font-size: 9.5px;
   font-family: var(--font-mono);
+}
+.sg-donut-pct {
+  fill: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  dominant-baseline: middle;
 }
 
 /* ---- the ? keymap button (sim header + home nav) ---- */

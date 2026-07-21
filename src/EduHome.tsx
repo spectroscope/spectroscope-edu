@@ -7,6 +7,7 @@ import { useLang } from "./state/lang";
 import { useDesignPrefs } from "./state/designPrefs";
 import { ThemeLangControls } from "./ThemeLangControls";
 import { SimGuide } from "./SimGuide";
+import { EduGuide } from "./EduGuide";
 import { ICON, type IconName } from "./Keymap";
 import type { Nav } from "./App";
 
@@ -127,7 +128,10 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
           </div>
         </header>
 
-        <SimGuide onEnter={props.onEnter} />
+        <div className="edu-home-guides">
+          <SimGuide onEnter={props.onEnter} />
+          <EduGuide onEnter={props.onEnter} />
+        </div>
 
         <section className="edu-home-keymap" aria-label={t({ en: "keyboard shortcuts", de: "tastenbelegung" }, lang)}>
           <button
