@@ -18,6 +18,7 @@ import {
   useNodesState,
   type Edge,
   type Node,
+  type ReactFlowInstance,
 } from "@xyflow/react";
 import type { RunEvent } from "../events";
 import { isLocalProvider, type Scene } from "./labScene";
@@ -49,6 +50,9 @@ export function FlowMap(props: {
   model?: string;
   /** The main agent's system prompt (from /api/context) for the agent card. */
   systemPrompt?: string;
+  /** Bump this to re-fit the map when its container resizes (e.g. a side drawer
+   *  opened/closed) — the `fitView` prop only fits on init. */
+  fitSignal?: number;
 }) {
   const { scene, applied, provider, model, systemPrompt } = props;
   const local = isLocalProvider(provider);
@@ -63,6 +67,21 @@ export function FlowMap(props: {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const layoutRef = useRef(local);
+  const rfRef = useRef<ReactFlowInstance<Node, Edge> | null>(null);
+
+  // Re-fit when the caller bumps fitSignal (a side drawer opened/closed, so the
+  // container width changed). The `fitView` prop fits only on init, so without
+  // this the map stays anchored top-left and clips. setTimeout(0) lets React
+  // Flow's own ResizeObserver settle first; no rAF loop (the embedded preview
+  // pane stalls rAF).
+  useEffect(() => {
+    if (props.fitSignal === undefined) return;
+    // Instant fit (no `duration`): an animated fit runs an rAF loop, which the
+    // embedded preview pane stalls; a one-shot fit applies in a single frame and
+    // reads correctly. On a real browser the snap is immediate and clean.
+    const id = setTimeout(() => rfRef.current?.fitView({ padding: 0.16 }), 0);
+    return () => clearTimeout(id);
+  }, [props.fitSignal]);
 
   // Sync folded scene -> flow, preserving drag positions unless the layout
   // flipped (local/remote). Subagent nodes always take their freshly computed
@@ -89,6 +108,9 @@ export function FlowMap(props: {
       <ReactFlow
         key={local ? "local" : "remote"}
         className="pf-flow"
+        onInit={(inst) => {
+          rfRef.current = inst;
+        }}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}

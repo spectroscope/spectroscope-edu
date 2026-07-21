@@ -194,7 +194,126 @@
   min-height: 0;
   padding: var(--sp-4);
   gap: var(--sp-3);
-  overflow: auto;
+  overflow: hidden;
+}
+
+/* the map + its two side drawers share one row; the center column holds the
+   controls, the FlowMap hero and the reading hint. */
+.sim-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: var(--sp-3);
+  /* narrow window + both drawers open: scroll the row instead of collapsing the
+     map or clipping a drawer (the center keeps its min-width floor below). */
+  overflow-x: auto;
+}
+.sim-center {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  /* floor: the map hero never collapses when both drawers are open. */
+  min-width: 340px;
+  min-height: 0;
+  gap: var(--sp-3);
+  /* short viewport: scroll the controls/map/hint (the map keeps its 540px
+     min-height) instead of clipping the hint — restores the lifted .lab-center. */
+  overflow-y: auto;
+}
+
+/* ---- collapsible side drawers (v3 style): jsonl left, trace right ---- */
+.edu-drawer {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  overflow: hidden;
+}
+.edu-drawer:not(.is-open) {
+  width: 36px;
+}
+.edu-drawer--left.is-open {
+  width: clamp(260px, 20vw, 320px);
+}
+.edu-drawer--right.is-open {
+  width: clamp(300px, 26vw, 400px);
+}
+
+/* the folded rail: a labelled vertical spine that expands on click */
+.edu-drawer-rail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+  background: none;
+  border: 0;
+  color: var(--text-dim);
+  font: inherit;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.edu-drawer-rail:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.edu-drawer-chevron {
+  font-size: var(--fs-16);
+  line-height: 1;
+}
+.edu-drawer-rail-label {
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: var(--fs-11);
+}
+
+/* the open panel: a small head with the collapse chevron, then the content */
+.edu-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+.edu-drawer-title {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: var(--fs-11);
+  color: var(--text-faint);
+}
+.edu-drawer-toggle {
+  background: none;
+  border: 0;
+  padding: 0 var(--sp-1);
+  color: var(--text-dim);
+  font-size: var(--fs-20);
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--t-fast);
+}
+.edu-drawer-toggle:hover {
+  color: var(--text);
+}
+.edu-drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* the lifted panels expect to be a flex child in a horizontal row; inside the
+   drawer body (a column) make them fill instead. */
+.edu-drawer-body > .lab-trace,
+.edu-drawer-body > .trace-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
 }
 .sim-head {
   display: flex;
