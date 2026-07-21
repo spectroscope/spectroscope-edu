@@ -40,7 +40,9 @@ export const DESIGNS: ReadonlyArray<{
 
 const DESIGN_IDS = DESIGNS.map((d) => d.id);
 export const STORAGE_KEY = "spectroscope:design";
-export const DEFAULT_PREFS: DesignPrefs = { design: "spectroscope", scroll: true, particles: true, reasoningLens: false };
+// The edu app opens BRIGHT by default (owner 2026-07-21): paper, not the
+// espresso dark that spectro-web defaults to. Existing saved prefs are honored.
+export const DEFAULT_PREFS: DesignPrefs = { design: "paper", scroll: true, particles: true, reasoningLens: false };
 
 // Side-effect seams — real localStorage + DOM by default, swappable in tests
 // (the suite runs in plain Node with no jsdom, so it injects in-memory versions).

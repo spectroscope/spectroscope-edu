@@ -26,6 +26,7 @@ const LESSON_TITLES: Localized[] = [
 const THEMES: { id: DesignId; label: string }[] = [
   { id: "spectroscope", label: "spectroscope" },
   { id: "paper", label: "paper" },
+  { id: "still", label: "white" },
 ];
 
 export function Sidebar(props: {

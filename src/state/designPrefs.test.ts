@@ -34,7 +34,7 @@ const lastApplied = (): DesignPrefs => applied[applied.length - 1];
 
 describe("designPrefs store", () => {
   it("defaults to the brand design with both effects on when storage is empty", () => {
-    expect(DEFAULT_PREFS.design).toBe("spectroscope");
+    expect(DEFAULT_PREFS.design).toBe("paper");
     expect(readSaved()).toEqual(DEFAULT_PREFS);
     expect(isDirty()).toBe(false);
     expect(lastApplied()).toEqual(DEFAULT_PREFS); // reset applied the default
@@ -65,7 +65,7 @@ describe("designPrefs store", () => {
 
   it("parsePrefs seeds from storage and rejects an unknown design id", () => {
     const p = parsePrefs(JSON.stringify({ design: "bogus", scroll: false, particles: false }));
-    expect(p.design).toBe("spectroscope"); // unknown -> default
+    expect(p.design).toBe("paper"); // unknown -> default
     expect(p.scroll).toBe(false);
     expect(p.particles).toBe(false);
   });
@@ -87,7 +87,7 @@ describe("designPrefs store", () => {
     // still stores one must land on the brand default, other prefs intact.
     for (const retired of ["classic", "nebula", "nocturne", "obsidian", "staffwise", "neon-riot", "prisma"]) {
       const p = parsePrefs(JSON.stringify({ design: retired, particles: false }));
-      expect(p.design).toBe("spectroscope");
+      expect(p.design).toBe("paper");
       expect(p.particles).toBe(false);
     }
   });

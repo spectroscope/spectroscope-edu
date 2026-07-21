@@ -17,7 +17,7 @@
           var p = raw ? JSON.parse(raw) : {};
           var ids = ["spectroscope", "paper", "still"];
           var el = document.documentElement;
-          el.setAttribute("data-design", ids.indexOf(p.design) >= 0 ? p.design : "spectroscope");
+          el.setAttribute("data-design", ids.indexOf(p.design) >= 0 ? p.design : "paper");
           el.classList.toggle("fx-scroll", typeof p.scroll === "boolean" ? p.scroll : true);
           el.classList.toggle("fx-particles", typeof p.particles === "boolean" ? p.particles : true);
         } catch (e) {
