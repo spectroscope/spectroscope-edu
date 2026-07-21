@@ -33,7 +33,8 @@ export function App() {
   const [eduLessonId, setEduLessonId] = useState<string>(LESSONS[0].id);
   const [keymapOpen, setKeymapOpen] = useState(false);
 
-  // Global shortcuts: ? toggles the keymap, Esc closes it, h goes home.
+  // Global shortcuts: ? (or ß, the same physical key without Shift on a German
+  // layout) toggles the keymap, Esc closes it, h goes home.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -41,7 +42,7 @@ export function App() {
         return;
       }
       if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key === "?") {
+      if (e.key === "?" || e.key === "ß") {
         e.preventDefault();
         setKeymapOpen((o) => !o);
       } else if (e.key === "h") {
@@ -80,7 +81,7 @@ export function App() {
               </ErrorBoundary>
             ) : (
               <ErrorBoundary key={`edu-${eduLessonId}`} lang={lang}>
-                <EduView key={eduLessonId} lessonId={eduLessonId} />
+                <EduView key={eduLessonId} lessonId={eduLessonId} onOpenKeymap={() => setKeymapOpen(true)} />
               </ErrorBoundary>
             )}
           </main>

@@ -16,9 +16,16 @@
 }
 
 .edu-lesson-head {
+  position: relative;
   padding: var(--sp-4) var(--sp-5) var(--sp-3);
   border-bottom: 1px solid var(--border);
   flex: none;
+}
+/* the keymap (?) button, top-right of the lesson header */
+.edu-head-keys {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-5);
 }
 .edu-lesson-head h1 {
   margin: var(--sp-1) 0 0;

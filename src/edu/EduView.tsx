@@ -26,7 +26,7 @@ const DEFAULT_READOUT: Record<string, { en: string; de: string }> = {
   none: { en: "", de: "" },
 };
 
-export function EduView({ lessonId }: { lessonId: string }) {
+export function EduView({ lessonId, onOpenKeymap }: { lessonId: string; onOpenKeymap: () => void }) {
   const lang = useLang();
   const de = lang === "de";
   useEduProgress(); // subscribe so the completion flag re-renders
@@ -116,6 +116,15 @@ export function EduView({ lessonId }: { lessonId: string }) {
   return (
     <section className="edu-view" aria-label="edu lesson">
       <header className="edu-lesson-head">
+        <button
+          type="button"
+          className="sim-keys edu-head-keys"
+          onClick={onOpenKeymap}
+          title={de ? "Tastaturkürzel (? oder ß)" : "keyboard shortcuts (? or ß)"}
+          aria-label={de ? "Tastaturkürzel" : "keyboard shortcuts"}
+        >
+          ?
+        </button>
         <p className="eyebrow">{(de ? "lerneinheit · " : "learning unit · ") + lesson.difficulty}</p>
         <h1>{ll(lesson.title, de)}</h1>
         <p className="edu-blurb">{ll(lesson.blurb, de)}</p>

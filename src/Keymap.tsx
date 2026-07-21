@@ -38,7 +38,7 @@ const GROUPS: Group[] = [
     title: { en: "navigation", de: "navigation" },
     rows: [
       { keys: ["h"], icon: "home", label: { en: "home", de: "startseite" } },
-      { keys: ["?"], icon: "keys", label: { en: "this keymap", de: "diese keymap" } },
+      { keys: ["?", "ß"], icon: "keys", label: { en: "this keymap", de: "diese keymap" } },
       { keys: ["esc"], icon: "close", label: { en: "close", de: "schließen" } },
     ],
   },

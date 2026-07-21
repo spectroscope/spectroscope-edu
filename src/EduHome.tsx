@@ -97,7 +97,7 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
             type="button"
             className="sim-keys"
             onClick={props.onOpenKeymap}
-            title={lang === "de" ? "Tastaturkürzel (?)" : "keyboard shortcuts (?)"}
+            title={lang === "de" ? "Tastaturkürzel (? oder ß)" : "keyboard shortcuts (? or ß)"}
             aria-label={lang === "de" ? "Tastaturkürzel" : "keyboard shortcuts"}
           >
             ?
