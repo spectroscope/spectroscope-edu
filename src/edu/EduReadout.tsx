@@ -112,28 +112,31 @@ export function EduReadout(props: {
   const pct = Math.min(100, (total / cap) * 100);
   const state = win.state ?? (pct >= 90 ? "error" : pct >= 70 ? "warn" : "ok");
   const col = state === "error" ? "var(--error)" : state === "warn" ? "var(--warn)" : "var(--ok)";
-  const circ = 2 * Math.PI * 30;
+  const R = 56;
+  const circ = 2 * Math.PI * R;
   const off = circ * (1 - pct / 100);
   return (
     <div className="edu-readout-body">
-      <div className="donut">
-        <svg width="84" height="84" viewBox="0 0 84 84">
-          <circle cx="42" cy="42" r="30" fill="none" stroke="var(--surface-3)" strokeWidth="8" />
+      <div className="donut donut--big">
+        <svg width="148" height="148" viewBox="0 0 148 148">
+          <circle cx="74" cy="74" r={R} fill="none" stroke="var(--surface-3)" strokeWidth="16" />
           <circle
-            cx="42"
-            cy="42"
-            r="30"
+            cx="74"
+            cy="74"
+            r={R}
             fill="none"
             stroke={col}
-            strokeWidth="8"
+            strokeWidth="16"
             strokeLinecap="round"
             strokeDasharray={circ}
             strokeDashoffset={off}
-            transform="rotate(-90 42 42)"
+            transform="rotate(-90 74 74)"
+            style={{ transition: "stroke-dashoffset 0.5s var(--ease-out), stroke 0.3s" }}
           />
+          <text x="74" y="70" textAnchor="middle" className="donut-pct">{Math.round(pct)}%</text>
+          <text x="74" y="90" textAnchor="middle" className="donut-sub">{fmt(total)} tok</text>
         </svg>
         <div className="dv">
-          <b className="tabular">{Math.round(pct)}%</b>
           <small>
             {fmt(total)} / {Math.round(cap / 1000)}k tok
           </small>

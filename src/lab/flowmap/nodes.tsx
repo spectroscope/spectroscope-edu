@@ -4,8 +4,9 @@
 // beats a hand-rolled SVG for this view. All styling is design-token based, so
 // every node reskins with the 6 genomes; the disk animates via CSS.
 
-import { Fragment, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useContext, useState, type CSSProperties, type ReactNode } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { ExpandAllContext } from "./expandContext";
 import { JsonTree } from "../../components/JsonTree";
 import { NeuralNet } from "./NeuralNet";
 import { AluChip, Keyboard, Router } from "./glyphs";
@@ -36,7 +37,8 @@ function Handles() {
 }
 
 function Disclosure({ label, children, open: openDefault = false }: { label: string; children: ReactNode; open?: boolean }) {
-  const [open, setOpen] = useState(openDefault);
+  const expandAll = useContext(ExpandAllContext);
+  const [open, setOpen] = useState(openDefault || expandAll);
   return (
     <div className="pf-disc">
       <button className="pf-disc__btn nodrag" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
@@ -88,74 +90,106 @@ export function AgentNode({ data }: NodeProps) {
     prompt: string; systemPrompt: string | null; tool: { name: string; input: unknown } | null;
   };
   const lang = useLang();
+  const expandAll = useContext(ExpandAllContext);
   const busy = d.focus === "llm" || d.focus === "disk" || d.focus === "cmd" || d.focus === "mcp";
   const maxTok = Math.max(1, ...(d.ctxParts ?? []).map((p) => p.estTokens));
-  return (
-    <div className={`pf-card pf-agent${d.active || busy ? " pf-card--active" : ""}${d.error ? " pf-card--error" : ""}`}>
-      <div className="pf-agent__head">
-        <div className="pf-agent__title">
-          <span className="pf-avatar">◆</span>
-          Agent
-        </div>
-        <span className="pf-status" style={{ color: d.activity.color }}>
-          <span className={`pf-status__dot${busy ? " pf-pulse" : ""}`} />
-          {d.activity.text}
-        </span>
-      </div>
 
-      <div className={`pf-row${d.focus === "agent" ? " pf-row--lit" : ""}`}>
-        <span className="pf-row__label">Loop</span>
-        <span className="pf-row__note">{t(lang, "map.loop.note")}</span>
+  const head = (
+    <div className="pf-agent__head">
+      <div className="pf-agent__title">
+        <span className="pf-avatar">◆</span>
+        Agent
       </div>
-
-      <div className="pf-row" style={{ borderColor: d.gateColor }}>
-        <span className="pf-row__label">
-          <span className="pf-lock" style={{ color: d.gateColor }} />
-          {t(lang, "map.node.gate")}
-        </span>
-        <span className="pf-row__note" style={{ color: d.gateColor }}>{d.gateNote}</span>
-      </div>
-
+      <span className="pf-status" style={{ color: d.activity.color }}>
+        <span className={`pf-status__dot${busy ? " pf-pulse" : ""}`} />
+        {d.activity.text}
+      </span>
+    </div>
+  );
+  const loopRow = (
+    <div className={`pf-row${d.focus === "agent" ? " pf-row--lit" : ""}`}>
+      <span className="pf-row__label">Loop</span>
+      <span className="pf-row__note">{t(lang, "map.loop.note")}</span>
+    </div>
+  );
+  const gateRow = (
+    <div className="pf-row" style={{ borderColor: d.gateColor }}>
+      <span className="pf-row__label">
+        <span className="pf-lock" style={{ color: d.gateColor }} />
+        {t(lang, "map.node.gate")}
+      </span>
+      <span className="pf-row__note" style={{ color: d.gateColor }}>{d.gateNote}</span>
+    </div>
+  );
+  const toolsBlock = (
+    <>
       <div className="pf-eyebrow" style={{ marginTop: 10 }}>Tools</div>
       <div className="pf-tools">
         {AGENT_TOOL_CHIPS.map((tool) => (
           <span key={tool} className={`pf-chip${d.activeTool === tool ? " pf-chip--on" : ""}`}>{tool}</span>
         ))}
       </div>
+    </>
+  );
+  const ctxPanels = (
+    <>
+      {d.systemPrompt && (
+        <div className="pf-panelbox">
+          <div className="pf-panelbox__label">{t(lang, "map.ctx.systemPrompt")}</div>
+          <div className="pf-prose nowheel" style={{ textAlign: "left" }}>{d.systemPrompt}</div>
+        </div>
+      )}
+      {d.ctxParts && d.ctxTotals && (
+        <div className="pf-panelbox">
+          <div className="pf-panelbox__label">{t(lang, "map.ctx.toLlm")} · {d.ctxTotals.estimatedTokens.toLocaleString()} / {d.ctxTotals.threshold.toLocaleString()} tok</div>
+          <div className="pf-ctx">
+            {d.ctxParts.map((p) => (
+              <div className="pf-ctx__row" key={p.label}>
+                <span>{p.label}</span>
+                <span className="pf-ctx__bar"><span className="pf-ctx__fill" style={{ width: `${(p.estTokens / maxTok) * 100}%` }} /></span>
+                <span className="pf-ctx__tok">{p.estTokens}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {d.tool ? (
+        <div className="pf-panelbox">
+          <div className="pf-panelbox__label">{t(lang, "map.ctx.toolCall")} · {d.tool.name}</div>
+          <div className="nowheel" style={{ maxHeight: 150, overflow: "auto" }}>
+            <JsonTree value={d.tool.input} defaultDepth={3} />
+          </div>
+        </div>
+      ) : (
+        <div className="pf-kv">{t(lang, "map.ctx.noTool")}</div>
+      )}
+    </>
+  );
 
-      <Disclosure label={t(lang, "map.disc.context")} open={false}>
-        {d.systemPrompt && (
-          <div className="pf-panelbox">
-            <div className="pf-panelbox__label">{t(lang, "map.ctx.systemPrompt")}</div>
-            <div className="pf-prose nowheel" style={{ textAlign: "left" }}>{d.systemPrompt}</div>
+  return (
+    <div className={`pf-card pf-agent${d.active || busy ? " pf-card--active" : ""}${d.error ? " pf-card--error" : ""}${expandAll ? " pf-agent--wide" : ""}`}>
+      {head}
+      {expandAll ? (
+        // edu: the context sits BESIDE the controls (wider card, not a tall stack).
+        <div className="pf-agent__cols">
+          <div className="pf-agent__main">
+            {loopRow}
+            {gateRow}
+            {toolsBlock}
           </div>
-        )}
-        {d.ctxParts && d.ctxTotals && (
-          <div className="pf-panelbox">
-            <div className="pf-panelbox__label">{t(lang, "map.ctx.toLlm")} · {d.ctxTotals.estimatedTokens.toLocaleString()} / {d.ctxTotals.threshold.toLocaleString()} tok</div>
-            <div className="pf-ctx">
-              {d.ctxParts.map((p) => (
-                <div className="pf-ctx__row" key={p.label}>
-                  <span>{p.label}</span>
-                  <span className="pf-ctx__bar"><span className="pf-ctx__fill" style={{ width: `${(p.estTokens / maxTok) * 100}%` }} /></span>
-                  <span className="pf-ctx__tok">{p.estTokens}</span>
-                </div>
-              ))}
-            </div>
+          <div className="pf-agent__ctx">
+            <div className="pf-eyebrow">{t(lang, "map.disc.context")}</div>
+            {ctxPanels}
           </div>
-        )}
-        {d.tool ? (
-          <div className="pf-panelbox">
-            <div className="pf-panelbox__label">{t(lang, "map.ctx.toolCall")} · {d.tool.name}</div>
-            <div className="nowheel" style={{ maxHeight: 150, overflow: "auto" }}>
-              <JsonTree value={d.tool.input} defaultDepth={3} />
-            </div>
-          </div>
-        ) : (
-          <div className="pf-kv">{t(lang, "map.ctx.noTool")}</div>
-        )}
-      </Disclosure>
-
+        </div>
+      ) : (
+        <>
+          {loopRow}
+          {gateRow}
+          {toolsBlock}
+          <Disclosure label={t(lang, "map.disc.context")} open={false}>{ctxPanels}</Disclosure>
+        </>
+      )}
       <Handles />
     </div>
   );

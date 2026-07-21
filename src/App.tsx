@@ -10,6 +10,8 @@ import { SimView } from "./SimView";
 import { EduView } from "./edu/EduView";
 import { EduHome } from "./EduHome";
 import { Keymap } from "./Keymap";
+import { ErrorBoundary } from "./ErrorBoundary";
+import { useLang } from "./state/lang";
 import { navigate, useView } from "./state/route";
 import { SCENARIOS } from "./scenario/registry";
 import { LESSONS } from "./edu/lessons";
@@ -26,6 +28,7 @@ function isTyping(target: EventTarget | null): boolean {
 
 export function App() {
   const view = useView();
+  const lang = useLang();
   const [scenarioId, setScenarioId] = useState<string>(SCENARIOS[0].id);
   const [eduLessonId, setEduLessonId] = useState<string>(LESSONS[0].id);
   const [keymapOpen, setKeymapOpen] = useState(false);
@@ -72,9 +75,13 @@ export function App() {
           />
           <main className="edu-stage">
             {view === "simulator" ? (
-              <SimView scenarioId={scenarioId} onOpenKeymap={() => setKeymapOpen(true)} />
+              <ErrorBoundary key={`sim-${scenarioId}`} lang={lang}>
+                <SimView scenarioId={scenarioId} onOpenKeymap={() => setKeymapOpen(true)} />
+              </ErrorBoundary>
             ) : (
-              <EduView key={eduLessonId} lessonId={eduLessonId} />
+              <ErrorBoundary key={`edu-${eduLessonId}`} lang={lang}>
+                <EduView key={eduLessonId} lessonId={eduLessonId} />
+              </ErrorBoundary>
             )}
           </main>
         </div>

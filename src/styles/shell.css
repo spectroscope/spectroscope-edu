@@ -657,7 +657,7 @@
   backdrop-filter: blur(3px);
 }
 .km-panel {
-  width: min(520px, 100%);
+  width: min(680px, 100%);
   max-height: 86vh;
   overflow-y: auto;
   border: 1px solid var(--border-strong);
@@ -683,11 +683,24 @@
 .km-close:hover {
   color: var(--text);
 }
-.km-groups {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
+.km-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-16);
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
+.km-title-ico { color: var(--accent); display: inline-flex; }
+.km-title-ico svg { width: 22px; height: 22px; }
+.km-groups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4) var(--sp-6);
+}
+.km-group:last-child { grid-column: 1 / -1; }
 .km-group-title {
   margin: 0 0 var(--sp-2);
   text-transform: uppercase;
@@ -704,27 +717,30 @@
   gap: var(--sp-2);
 }
 .km-row {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-3);
+  display: grid;
+  grid-template-columns: 22px 96px 1fr;
+  align-items: center;
+  gap: 12px;
 }
+.km-ico { color: var(--text-faint); display: inline-flex; }
+.km-ico svg { width: 20px; height: 20px; }
 .km-keys {
-  flex: none;
   display: inline-flex;
-  gap: 4px;
-  min-width: 104px;
+  gap: 5px;
 }
 .km-key {
   display: inline-block;
-  min-width: 20px;
-  padding: 1px 6px;
+  min-width: 22px;
+  padding: 3px 8px 4px;
   text-align: center;
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-chip);
+  border-bottom-width: 3px;
+  border-radius: 6px;
   background: var(--surface-2);
-  color: var(--text-dim);
+  color: var(--text);
   font-family: var(--font-mono);
-  font-size: var(--fs-11);
+  font-size: 12px;
+  line-height: 1;
 }
 .km-label {
   color: var(--text-dim);
