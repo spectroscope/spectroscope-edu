@@ -6,7 +6,7 @@
 // scene to nodes/edges and renders the canvas. Extracted from the prototype's
 // SystemFlow orchestrator; the pure render pieces live in ./flowmap.
 
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -18,11 +18,13 @@ import {
   useNodesState,
   type Edge,
   type Node,
+  type NodeChange,
   type ReactFlowInstance,
 } from "@xyflow/react";
 import type { RunEvent } from "../events";
 import { isLocalProvider, type Scene } from "./labScene";
 import { deriveDetail, sceneToFlow } from "./flowmap/sceneToFlow";
+import { collectDraggedIds, mergeNodePositions } from "./flowmap/positions";
 import { t } from "../i18n/i18n";
 import { useLang } from "../state/lang";
 import { nodeTypes } from "./flowmap/nodes";
@@ -68,6 +70,19 @@ export function FlowMap(props: {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const layoutRef = useRef(local);
   const rfRef = useRef<ReactFlowInstance<Node, Edge> | null>(null);
+  // Nodes the user has dragged. Once pinned, a node keeps its position across
+  // every step (even a subagent, which otherwise re-centres) — so dragging a card
+  // is never undone by the next step. Cleared when the layout world flips.
+  const pinned = useRef(new Set<string>());
+
+  // Record a drag so the node stays put across the next step.
+  const onNodesChangePinned = useCallback(
+    (changes: NodeChange<Node>[]) => {
+      collectDraggedIds(changes, pinned.current);
+      onNodesChange(changes);
+    },
+    [onNodesChange],
+  );
 
   // Re-fit when the caller bumps fitSignal (a side drawer opened/closed, so the
   // container width changed). The `fitView` prop fits only on init, so without
@@ -83,21 +98,16 @@ export function FlowMap(props: {
     return () => clearTimeout(id);
   }, [props.fitSignal]);
 
-  // Sync folded scene -> flow, preserving drag positions unless the layout
-  // flipped (local/remote). Subagent nodes always take their freshly computed
-  // deterministic position so adding a second/third agent re-centres the group
-  // instead of stranding earlier cards (the clump bug from the prototype).
+  // Sync folded scene -> flow, preserving positions across steps. A main card
+  // keeps its position by default; a subagent keeps its freshly computed one so a
+  // new worker re-centres the group instead of stranding earlier cards (the clump
+  // bug from the prototype) — UNLESS the user dragged it, in which case it is
+  // pinned and stays. A local/remote flip re-lays-out everything and drops pins.
   useEffect(() => {
     const relayout = layoutRef.current !== local;
     layoutRef.current = local;
-    setNodes((prev) => {
-      const byId = new Map(prev.map((p) => [p.id, p]));
-      return flow.nodes.map((node) => {
-        const old = byId.get(node.id);
-        const keep = old && !relayout && !node.id.startsWith("sub-");
-        return keep ? { ...node, position: old.position } : node;
-      });
-    });
+    if (relayout) pinned.current.clear();
+    setNodes((prev) => mergeNodePositions(prev, flow.nodes, pinned.current, relayout));
     setEdges(flow.edges);
   }, [flow, local, setNodes, setEdges]);
 
@@ -113,7 +123,7 @@ export function FlowMap(props: {
         }}
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
+        onNodesChange={onNodesChangePinned}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
