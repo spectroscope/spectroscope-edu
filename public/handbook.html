@@ -54,7 +54,8 @@
     background:color-mix(in srgb,var(--bg) 88%,transparent);
     backdrop-filter:blur(8px);border-bottom:1px solid var(--border);
   }
-  .brand{display:inline-flex;align-items:center;gap:10px;font-weight:650}
+  .brand{display:inline-flex;align-items:center;gap:10px;font-weight:650;color:inherit}
+  .brand:hover{text-decoration:none;opacity:.8}
   .brand img{width:24px;height:24px}
   .brand .sub{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);border:1px solid var(--border);border-radius:999px;padding:2px 8px}
   .top .spacer{flex:1}
@@ -101,7 +102,7 @@
 </head>
 <body>
 <header class="top">
-  <span class="brand"><img id="mark" src="/brand/logo-icon.svg" alt="" /> spectroscope <span class="sub">edu</span></span>
+  <a class="brand" href="/"><img id="mark" src="/brand/logo-icon.svg" alt="" /> spectroscope <span class="sub">edu</span></a>
   <span class="spacer"></span>
   <a class="home-link" href="/"><span class="en">back to the app</span><span class="de">zurück zur app</span> &#8599;</a>
   <span class="toggle" id="lang"><button data-l="en">en</button><button data-l="de">de</button></span>
