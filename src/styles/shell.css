@@ -830,16 +830,27 @@
 }
 .edu-home-sim-cap {
   display: flex;
-  align-items: baseline;
-  gap: var(--sp-3);
+  flex-direction: column;
+  gap: 4px;
   margin-top: var(--sp-3);
+}
+/* the title is its own line and clearly bigger, so the two cards read apart
+   at a glance: "the simulator" vs. "the lessons". */
+.edu-home-sim-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-20);
+  line-height: 1.2;
+}
+.edu-home-sim-title strong {
+  color: var(--text);
+  font-weight: 650;
+}
+.edu-home-sim-desc {
   color: var(--text-dim);
   font-size: var(--fs-13);
   line-height: var(--lh-body);
-}
-.edu-home-sim-cap strong {
-  color: var(--text);
-  font-weight: 600;
 }
 .edu-home-sim-play {
   flex: none;

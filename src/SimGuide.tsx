@@ -71,12 +71,14 @@ export function SimGuide(props: { onEnter: (view: Nav) => void }) {
       </svg>
 
       <span className="edu-home-sim-cap">
-        <span className="edu-home-sim-play" aria-hidden="true">▸</span>
-        <span>
+        <span className="edu-home-sim-title">
+          <span className="edu-home-sim-play" aria-hidden="true">▸</span>
           <strong>{lang === "de" ? "der simulator" : "the simulator"}</strong>
+        </span>
+        <span className="edu-home-sim-desc">
           {lang === "de"
-            ? " — steuere einen gescripteten agenten-lauf: schritt, abspielen, zurückspulen. klick öffnet ihn."
-            : " — steer a scripted agent run: step, play, scrub back. click to open it."}
+            ? "steuere einen gescripteten agenten-lauf: schritt, abspielen, zurückspulen. klick öffnet ihn."
+            : "steer a scripted agent run: step, play, scrub back. click to open it."}
         </span>
       </span>
     </button>

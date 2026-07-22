@@ -67,12 +67,14 @@ export function EduGuide(props: { onEnter: (view: Nav) => void }) {
       </svg>
 
       <span className="edu-home-sim-cap">
-        <span className="edu-home-sim-play" aria-hidden="true">▸</span>
-        <span>
+        <span className="edu-home-sim-title">
+          <span className="edu-home-sim-play" aria-hidden="true">▸</span>
           <strong>{lang === "de" ? "die lektionen" : "the lessons"}</strong>
+        </span>
+        <span className="edu-home-sim-desc">
           {lang === "de"
-            ? " — bau einen agenten teil für teil auf, interaktiv: kontextfenster, schleife, gate, fan-out. klick öffnet edu."
-            : " — build an agent up part by part, interactive: the context window, the loop, the gate, fan-out. click to open edu."}
+            ? "bau einen agenten teil für teil auf, interaktiv: kontextfenster, schleife, gate, fan-out. klick öffnet edu."
+            : "build an agent up part by part, interactive: the context window, the loop, the gate, fan-out. click to open edu."}
         </span>
       </span>
     </button>
