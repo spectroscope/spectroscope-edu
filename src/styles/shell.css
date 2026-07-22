@@ -770,6 +770,10 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-4);
   margin: 0 0 var(--sp-6);
+  /* keep each card its natural height so both preview svgs sit flush at the top;
+     without this the shorter card stretches and the native button centers its
+     content, dropping its svg below the taller card's. */
+  align-items: start;
 }
 @media (max-width: 720px) {
   .edu-home-guides {
