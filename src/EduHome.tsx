@@ -86,11 +86,15 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
   return (
     <div className="edu-home">
       <nav className="edu-home-nav">
-        <span className="edu-home-brand">
+        <a
+          className="edu-home-brand"
+          href="https://spectroscope.ai/"
+          title={lang === "de" ? "zur Hauptseite (spectroscope.ai)" : "to the main site (spectroscope.ai)"}
+        >
           <img className="edu-brand-mark" src={mark} alt="" />
           <span className="edu-brand-name">spectroscope</span>
           <span className="edu-brand-sub">edu</span>
-        </span>
+        </a>
         <a className="edu-home-mainlink" href="https://spectroscope.ai/">
           {t({ en: "main site", de: "hauptseite" }, lang)} &#8599;
         </a>
@@ -110,11 +114,15 @@ export function EduHome(props: { onEnter: (view: Nav) => void; onOpenKeymap: () 
 
       <div className="edu-home-wrap">
         <header className="edu-home-hero">
-          <div className="edu-hero-brand">
+          <a
+            className="edu-hero-brand"
+            href="https://spectroscope.ai/"
+            title={lang === "de" ? "zur Hauptseite (spectroscope.ai)" : "to the main site (spectroscope.ai)"}
+          >
             <img className="edu-hero-mark" src={mark} alt="" />
             <span className="edu-hero-name">spectroscope</span>
             <span className="edu-hero-sub">edu</span>
-          </div>
+          </a>
           <p className="eyebrow sand">{t({ en: "the edu portal · learn what you're watching", de: "das edu-portal · verstehe, was du beobachtest" }, lang)}</p>
           <h1>{t({ en: "how an agent actually works", de: "wie ein agent wirklich arbeitet" }, lang)}</h1>
           <p className="edu-home-lede">
